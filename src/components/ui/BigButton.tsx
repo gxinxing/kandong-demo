@@ -34,21 +34,22 @@ export type BigButtonProps = ButtonAsButton | ButtonAsAnchor;
 
 const VARIANT_STYLE: Record<BigButtonVariant, CSSProperties> = {
   primary: {
-    background: "var(--color-fg)",
-    color: "var(--color-bg)",
-    boxShadow: "var(--shadow-button)",
-    border: "var(--rule-medium) solid var(--color-rule)",
+    background: "var(--color-amethyst)",
+    color: "var(--color-amethyst-ink)",
+    boxShadow: "none",
+    border: "1.5px solid var(--color-ink)",
   },
   secondary: {
-    background: "var(--color-surface)",
-    color: "var(--color-fg)",
-    boxShadow: "var(--shadow-button)",
-    border: "var(--rule-medium) solid var(--color-rule)",
+    background: "transparent",
+    color: "var(--color-ink)",
+    boxShadow: "none",
+    border: "1.5px solid var(--color-ink)",
   },
   ghost: {
     background: "transparent",
-    color: "var(--color-fg)",
-    border: "var(--rule-hair) solid var(--color-rule)",
+    color: "var(--color-ink)",
+    border: "1px dashed var(--color-detail)",
+    boxShadow: "none",
   },
 };
 
@@ -59,28 +60,27 @@ const baseClass = [
   "gap-3",
   "select-none",
   "cursor-pointer",
-  "transition-transform",
+  "transition-all",
   "duration-[var(--duration-fast)]",
   "ease-[cubic-bezier(0.16,1,0.3,1)]",
-  "active:translate-x-[2px]",
-  "active:translate-y-[2px]",
+  "active:scale-[0.98]",
+  "hover:shadow-[0_12px_28px_rgba(0,0,0,0.06)]",
   "disabled:opacity-50",
   "disabled:cursor-not-allowed",
-  "disabled:active:translate-x-0",
-  "disabled:active:translate-y-0",
+  "disabled:active:scale-100",
 ].join(" ");
 
 const inlineSizing: CSSProperties = {
-  minHeight: 96,
+  minHeight: 88,
   minWidth: 88,
-  padding: "var(--space-2) var(--space-3)",
+  padding: "var(--space-4) var(--space-6)",
   fontSize: "var(--text-button)",
-  fontFamily: "var(--font-display)",
-  fontWeight: 900,
-  lineHeight: 1.1,
-  letterSpacing: "-0.01em",
+  fontFamily: "var(--font-sans)",
+  fontWeight: 600,
+  lineHeight: 1.2,
+  letterSpacing: "0",
   textDecoration: "none",
-  borderRadius: "var(--radius-button)",
+  borderRadius: "var(--radius-lg)",
   width: "100%",
   justifyContent: "space-between",
   textAlign: "left",
@@ -88,12 +88,12 @@ const inlineSizing: CSSProperties = {
 
 const Arrow = (
   <svg
-    width="40"
-    height="40"
+    width="28"
+    height="28"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2.6"
+    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
@@ -130,7 +130,7 @@ export function BigButton(props: BigButtonProps) {
         style={{
           display: "inline-flex",
           alignItems: "center",
-          gap: "var(--space-2)",
+          gap: "var(--space-3)",
           flex: 1,
           minWidth: 0,
         }}
@@ -146,7 +146,7 @@ export function BigButton(props: BigButtonProps) {
         <span
           aria-hidden="true"
           className="inline-flex items-center"
-          style={{ flexShrink: 0 }}
+          style={{ flexShrink: 0, opacity: 0.9 }}
         >
           {Arrow}
         </span>

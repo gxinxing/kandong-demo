@@ -1,103 +1,146 @@
+/* Fontshare Switzer + Google Fraunces (PP Editorial New stand-in) */
+@import url("https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&display=swap");
 @import "tailwindcss";
 
 /* ===========================================================================
-   看懂一下 (Kandong) — Editorial Poster Design System
-   PRD §7 适老化规范: WCAG AAA, 60+ users, large type, generous touch targets.
-   Visual direction: editorial broadsheet — oversized display type, semantic
-   color blocks, rule lines, dateline eyebrow, paper-toned surface.
+   看懂一下 (Kandong) — Mobile · Soft Editorial · Cloud Canvas + Porcelain
+   Design tokens: cloud-canvas bg, porcelain surface, graphite/ink text,
+   platinum/silver borders, deep-plum muted, amethyst/sky-blue decorative
+   accents. PP Editorial New display (Fraunces fallback), Switzer body.
+   Semantic risk red/yellow/green retained for安全信号.
+   适老化: AAA contrast on text, 88px touch targets, prefers-reduced-motion.
    =========================================================================== */
 
 :root {
-  /* Paper + ink */
-  --color-bg: #f5f0e6;         /* Warm newsprint */
-  --color-paper: #ede5d3;      /* Slightly deeper paper for surfaces */
-  --color-fg: #161616;         /* Near-black ink */
-  --color-fg-soft: #2c2c2c;
-  --color-muted: #5a5045;      /* Warm gray for editorial captions */
-  --color-rule: #161616;       /* Rule lines are full black */
-  --color-rule-soft: #c8bea8;  /* Hairline rule on paper */
-  --color-surface: #fbf7ee;    /* Card surface, lighter than bg */
-  --color-border: #c8bea8;
+  /* Surfaces — warm cream base, porcelain cards */
+  --color-canvas: #f5f2f0;       /* cloud-canvas page bg */
+  --color-surface: #ffffff;      /* porcelain card */
+  --color-bg: var(--color-canvas);
+  --color-paper: var(--color-surface);
 
-  /* Risk semantics — anchors of the whole system */
+  /* Text — graphite body, ink display */
+  --color-fg: #333333;           /* graphite-text */
+  --color-ink: #000000;          /* ink-text headlines */
+  --color-fg-soft: #333333;
+  --color-muted: #7b7b7b;        /* deep-plum tertiary */
+
+  /* Borders + detail */
+  --color-border: #d6d6d6;       /* platinum */
+  --color-detail: #bcbcbc;       /* silver */
+  --color-rule: #d6d6d6;
+  --color-rule-strong: #333333;
+
+  /* Decorative brand accents */
+  --color-amethyst: #f1ccff;     /* primary action / brand */
+  --color-amethyst-ink: #4a1166; /* readable on amethyst */
+  --color-sky: #91e0ff;          /* secondary accent */
+  --color-sky-ink: #0a4a66;
+
+  /* Semantic risk — kept high-contrast for safety signal */
   --color-red: #c0162a;
-  --color-red-soft: #f7d9dd;
+  --color-red-soft: #fde7ea;
   --color-red-ink: #6a0a16;
-  --color-yellow: #d68b00;
-  --color-yellow-soft: #f7e6c4;
-  --color-yellow-ink: #4a2f00;
+  --color-yellow: #e0a800;
+  --color-yellow-soft: #fbf0c4;
+  --color-yellow-ink: #5a3d00;
   --color-green: #1e6a32;
-  --color-green-soft: #d5e7d7;
+  --color-green-soft: #d8eedd;
   --color-green-ink: #0a3014;
 
-  /* Focus ring (high-contrast amber per WCAG SC 2.4.11) */
-  --color-focus: #ffb300;
+  /* Focus ring — amethyst-on-ink for AA visibility */
+  --color-focus: #f1ccff;
 
-  /* Type scale — editorial poster scale, fluid across phone & tablet */
-  --text-eyebrow: clamp(0.95rem, 0.85rem + 0.3vw, 1.1rem);     /* small caps */
-  --text-caption: clamp(1.125rem, 0.95rem + 0.4vw, 1.25rem);   /* >=18px */
-  --text-body:    clamp(1.5rem, 1.3rem + 0.6vw, 1.75rem);      /* >=24px */
-  --text-button:  clamp(2rem, 1.7rem + 0.8vw, 2.25rem);        /* >=32px */
-  --text-title:   clamp(2.75rem, 2.1rem + 2.6vw, 3.75rem);     /* section heads */
-  --text-hero:    clamp(4rem, 2.8rem + 4.6vw, 6rem);           /* article lede */
-  --text-masthead: clamp(5.5rem, 3.2rem + 8vw, 9rem);          /* poster word */
-  --text-numeral: clamp(3rem, 2rem + 3vw, 4.5rem);             /* hanging 一二三 */
+  /* Type scale — mapped from token JSON, mobile-tuned */
+  --text-sm: 13px;
+  --text-sm-2: 14px;
+  --text-base: 16px;
+  --text-xl: 20px;
+  --text-3xl: 32px;
+  --text-5xl: 48px;
+  --text-5xl-3: 62px;
 
-  /* Spacing — 8/16/24/32/48/72 ladder */
-  --space-1: 0.5rem;
-  --space-2: 1rem;
-  --space-3: 1.5rem;
-  --space-4: 2rem;
-  --space-5: 3rem;
-  --space-6: 4.5rem;
+  /* Aliases for editorial language */
+  --text-eyebrow: var(--text-sm);            /* 13px caps */
+  --text-caption: var(--text-sm-2);          /* 14px helper */
+  --text-body: var(--text-base);             /* 16px running */
+  --text-body-lg: 18px;
+  --text-button: var(--text-xl);             /* 20px CTA */
+  --text-title: var(--text-3xl);             /* 32px sub-heads */
+  --text-hero: var(--text-5xl);              /* 48px verdict */
+  --text-masthead: var(--text-5xl-3);        /* 62px display */
+  --text-numeral: 56px;                      /* hanging 一二三 */
 
-  /* Radii — editorial = sharper */
-  --radius-card: 6px;
-  --radius-button: 4px;
+  /* Spacing — from token JSON, 4px unit */
+  --space-unit: 4px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 56px;
+  --space-10: 60px;
+  --space-11: 80px;
+  --space-12: 88px;
+  --space-13: 116px;
+  --space-14: 160px;
+
+  /* Radii — soft, generous */
+  --radius-sm: 10px;
+  --radius-md: 13px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+  --radius-3xl-2: 42px;
+  --radius-full: 48px;
   --radius-pill: 999px;
 
-  /* Rules */
-  --rule-heavy: 4px;
-  --rule-medium: 2px;
-  --rule-hair: 1px;
+  /* Shadows — feather-light, no hard print offsets */
+  --shadow-subtle: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.05),
+                 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-focus: 0 0 0 4px var(--color-amethyst),
+                  0 0 0 6px var(--color-ink);
 
-  /* Shadows — minimal, editorial doesn't lean on glow */
-  --shadow-card: 0 1px 0 var(--color-rule), 4px 4px 0 var(--color-rule);
-  --shadow-card-soft: 0 1px 2px rgba(22, 22, 22, 0.08),
-                      0 2px 6px rgba(22, 22, 22, 0.06);
-  --shadow-button: 4px 4px 0 var(--color-rule);
-  --shadow-focus: 0 0 0 4px var(--color-focus),
-                  0 0 0 6px var(--color-rule);
+  /* Rules */
+  --rule-hair: 1px;
+  --rule-medium: 1px;
 
   /* Motion */
   --duration-fast: 150ms;
   --duration-normal: 300ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Layout */
-  --max-width: 680px;
+  /* Layout — phone-first */
+  --max-width: 480px;
 
-  /* Display vs body Chinese stacks — editorial uses a serif/song display
-     when available, falls back gracefully on all platforms */
-  --font-display: "STSong", "Songti SC", "Source Han Serif SC",
-                  "Noto Serif CJK SC", "SimSun", "PingFang SC",
-                  "Hiragino Sans GB", "Microsoft YaHei", serif;
-  --font-cn: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-             "Source Han Sans SC", "Noto Sans CJK SC", "Heiti SC",
-             system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-             Roboto, sans-serif;
+  /* Font stacks */
+  --font-display: "Fraunces", "PP Editorial New", "Times New Roman",
+                  "Songti SC", "STSong", "Source Han Serif SC",
+                  "Noto Serif CJK SC", serif;
+  --font-sans: "Switzer", -apple-system, BlinkMacSystemFont, "PingFang SC",
+               "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+               system-ui, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 }
 
-/* Tailwind v4 token bridge */
 @theme inline {
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
   --color-bg: var(--color-bg);
   --color-paper: var(--color-paper);
   --color-fg: var(--color-fg);
+  --color-ink: var(--color-ink);
   --color-muted: var(--color-muted);
-  --color-surface: var(--color-surface);
   --color-border: var(--color-border);
-  --color-rule: var(--color-rule);
+  --color-detail: var(--color-detail);
+  --color-amethyst: var(--color-amethyst);
+  --color-sky: var(--color-sky);
   --color-red: var(--color-red);
   --color-red-soft: var(--color-red-soft);
   --color-yellow: var(--color-yellow);
@@ -106,28 +149,22 @@
   --color-green-soft: var(--color-green-soft);
   --color-focus: var(--color-focus);
 
-  --font-sans: var(--font-cn);
+  --font-sans: var(--font-sans);
   --font-serif: var(--font-display);
 
-  --text-eyebrow: var(--text-eyebrow);
-  --text-caption: var(--text-caption);
-  --text-body: var(--text-body);
-  --text-button: var(--text-button);
-  --text-title: var(--text-title);
-  --text-hero: var(--text-hero);
-  --text-masthead: var(--text-masthead);
-  --text-numeral: var(--text-numeral);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-xl: var(--text-xl);
+  --text-3xl: var(--text-3xl);
+  --text-5xl: var(--text-5xl);
 
-  --spacing-1: var(--space-1);
-  --spacing-2: var(--space-2);
-  --spacing-3: var(--space-3);
-  --spacing-4: var(--space-4);
-  --spacing-5: var(--space-5);
-  --spacing-6: var(--space-6);
-
-  --radius-card: var(--radius-card);
-  --radius-button: var(--radius-button);
-  --radius-pill: var(--radius-pill);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-3xl: var(--radius-3xl);
+  --radius-full: var(--radius-full);
 }
 
 /* ---------- Base ---------- */
@@ -146,28 +183,48 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
-  /* Newsprint paper — warm base + subtle grain via SVG noise */
-  background-color: var(--color-bg);
+  background-color: var(--color-canvas);
+  /* Paper atmosphere — subtle warm wash + faint grain via layered gradients.
+     Stays light enough to preserve AAA contrast on body copy. */
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(22, 22, 22, 0.045) 1px, transparent 0);
-  background-size: 14px 14px;
+    radial-gradient(
+      120% 60% at 50% 0%,
+      rgba(241, 204, 255, 0.18) 0%,
+      rgba(241, 204, 255, 0) 60%
+    ),
+    radial-gradient(
+      90% 50% at 100% 100%,
+      rgba(145, 224, 255, 0.14) 0%,
+      rgba(145, 224, 255, 0) 60%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.012) 0,
+      rgba(0, 0, 0, 0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  background-attachment: fixed;
   color: var(--color-fg);
-  font-family: var(--font-cn);
+  font-family: var(--font-sans);
   font-size: var(--text-body);
-  font-weight: 600;
-  line-height: 1.5;
-  letter-spacing: 0.01em;
+  font-weight: 400;
+  line-height: 1.44;
+  letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
-  font-weight: 900;
-  letter-spacing: -0.015em;
-  line-height: 1.05;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--color-ink);
 }
 
 p {
@@ -178,52 +235,210 @@ button {
   font-family: inherit;
 }
 
-/* ---------- Editorial primitives ---------- */
+/* ---------- Primitives ---------- */
 .kd-display {
   font-family: var(--font-display);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--color-ink);
 }
 
 .kd-eyebrow {
-  font-size: var(--text-eyebrow);
-  font-weight: 800;
-  letter-spacing: 0.22em;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-fg);
+  color: var(--color-muted);
+}
+
+.kd-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-7);
+}
+
+.kd-card-flat {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-3xl);
+  padding: var(--space-7);
 }
 
 .kd-rule {
   display: block;
   width: 100%;
-  height: var(--rule-heavy);
-  background: var(--color-rule);
+  height: 1px;
+  background: var(--color-border);
   border: 0;
   margin: 0;
 }
 
-.kd-rule-hair {
+/* Decorative pill chips (amethyst / sky) */
+.kd-chip-amethyst {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-amethyst);
+  color: var(--color-amethyst-ink);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.kd-chip-sky {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-sky);
+  color: var(--color-sky-ink);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Editorial primitives ---------- */
+
+/* Top-rule + bottom-rule masthead block, vertical metadata stacked under
+   wordmark — replaces fragile 3-col flex that overflowed on narrow phones. */
+.kd-masthead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) 0 var(--space-3);
+  border-top: 2px solid var(--color-ink);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.kd-masthead-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.kd-masthead-row > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kd-wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 13vw, 64px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+}
+
+/* Section eyebrow — short uppercase tracked label that sits above headlines.
+   Includes a hanging hairline rule for editorial weight. */
+.kd-section-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.kd-section-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 2px;
+  background: var(--color-ink);
+  flex-shrink: 0;
+}
+
+/* Ruled list — used for the three-rules block. Each item is divided by a hair
+   rule with a hanging Fraunces numeral in the gutter. */
+.kd-ruled-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.kd-ruled-list > li {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: var(--space-4);
+  align-items: baseline;
+  padding: var(--space-5) 0 var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.kd-ruled-list .kd-numeral {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.kd-ruled-list .kd-numeral-sub {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-top: var(--space-1);
+}
+
+/* Watermark glyph — the giant Fraunces character sitting behind the
+   risk-poster. Sets the editorial tone with scale contrast. */
+.kd-watermark {
+  position: absolute;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.78;
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Hair rule above section labels */
+.kd-hair {
   display: block;
   width: 100%;
-  height: var(--rule-hair);
-  background: var(--color-rule);
+  height: 1px;
+  background: var(--color-border);
   border: 0;
   margin: 0;
 }
 
-.kd-dropcap::first-letter {
-  font-family: var(--font-display);
-  font-size: 3.2em;
-  font-weight: 900;
-  float: left;
-  line-height: 0.85;
-  padding-right: 0.18em;
-  padding-top: 0.05em;
-  color: var(--color-fg);
+/* Thicker editorial rule */
+.kd-ink-rule {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--color-ink);
+  border: 0;
+  margin: 0;
 }
 
-/* ---------- Accessibility helpers ---------- */
+/* ---------- Accessibility ---------- */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -246,17 +461,17 @@ button {
   transform: translateX(-50%);
   width: auto;
   height: auto;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-5);
   margin: 0;
   overflow: visible;
   clip: auto;
   white-space: normal;
-  background: var(--color-fg);
-  color: var(--color-bg);
-  border-radius: var(--radius-button);
-  font-weight: 700;
-  font-size: var(--text-body);
-  box-shadow: var(--shadow-button);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: var(--text-base);
+  box-shadow: var(--shadow-md);
   z-index: 9999;
   text-decoration: none;
 }
@@ -264,7 +479,7 @@ button {
 :where(button, a, [role="button"], input, textarea, select):focus-visible {
   outline: none;
   box-shadow: var(--shadow-focus);
-  border-radius: var(--radius-button);
+  border-radius: var(--radius-full);
 }
 
 /* ---------- Reduced motion ---------- */

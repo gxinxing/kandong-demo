@@ -23,7 +23,7 @@ interface DemoOption {
   summary: string;
 }
 
-const LEVEL_LABEL: Record<DemoCase["level"], string> = {
+const LEVEL_GLYPH: Record<DemoCase["level"], string> = {
   red: "红",
   yellow: "黄",
   green: "绿",
@@ -35,7 +35,7 @@ const LEVEL_BG: Record<DemoCase["level"], string> = {
   green: "var(--color-green)",
 };
 
-const LEVEL_TEXT: Record<DemoCase["level"], string> = {
+const LEVEL_INK: Record<DemoCase["level"], string> = {
   red: "#fff5f0",
   yellow: "#1a1000",
   green: "#f0fff5",
@@ -102,153 +102,73 @@ export function HomeView() {
 
   const today = useMemo(() => formatToday(), []);
 
-  const mastheadStyle: CSSProperties = {
+  // Hero — typographic stack, no rounded card. Asymmetric weight on left,
+  // small metadata column on right.
+  const heroStyle: CSSProperties = {
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    gap: "var(--space-5)",
+    paddingBottom: "var(--space-6)",
+  };
+
+  const heroDisplayStyle: CSSProperties = {
     fontFamily: "var(--font-display)",
-    fontSize: "var(--text-masthead)",
-    fontWeight: 900,
-    lineHeight: 0.82,
+    fontSize: "clamp(76px, 22vw, 108px)",
+    fontWeight: 400,
+    lineHeight: 0.88,
     letterSpacing: "-0.04em",
-    color: "var(--color-fg)",
+    color: "var(--color-ink)",
     margin: 0,
   };
 
-  const eyebrowStyle: CSSProperties = {
-    fontSize: "var(--text-eyebrow)",
-    fontWeight: 800,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: "var(--color-fg)",
-  };
-
-  const subheadStyle: CSSProperties = {
+  const heroSubStyle: CSSProperties = {
     fontFamily: "var(--font-display)",
-    fontSize: "var(--text-title)",
-    fontWeight: 700,
-    lineHeight: 1.15,
+    fontSize: "clamp(22px, 6.5vw, 30px)",
+    fontWeight: 400,
+    fontStyle: "italic",
+    lineHeight: 1.2,
     letterSpacing: "-0.01em",
     color: "var(--color-fg)",
     margin: 0,
-    textWrap: "balance",
-  };
-
-  // Hero "risk灯 sample" — shows what the result looks like at a glance.
-  const heroBlockStyle: CSSProperties = {
-    background: "var(--color-red)",
-    color: "#fff5f0",
-    padding: "var(--space-3)",
-    display: "grid",
-    gridTemplateColumns: "auto 1fr",
-    gap: "var(--space-3)",
-    alignItems: "stretch",
-    boxShadow: "0 1px 0 var(--color-rule), 6px 6px 0 var(--color-rule)",
-    border: "var(--rule-medium) solid var(--color-rule)",
-  };
-
-  const heroGlyphStyle: CSSProperties = {
-    fontFamily: "var(--font-display)",
-    fontSize: "clamp(7rem, 5rem + 10vw, 11rem)",
-    fontWeight: 900,
-    lineHeight: 0.8,
-    letterSpacing: "-0.04em",
-    paddingRight: "var(--space-2)",
-    borderRight: "var(--rule-medium) solid #fff5f0",
-  };
-
-  const heroLabelStyle: CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    paddingLeft: "var(--space-1)",
-    gap: "var(--space-2)",
+    maxWidth: "30ch",
   };
 
   return (
     <PageShell
-      masthead={{ kicker: "KANDONG", issue: "反诈助手", date: today }}
+      masthead={{
+        kicker: "KANDONG · 反诈助手",
+        issue: "VOL.1 · No.001",
+        date: today,
+      }}
     >
-      {/* MASTHEAD */}
-      <section style={{ paddingTop: "var(--space-2)" }}>
-        <p style={eyebrowStyle}>给爸妈的反诈助手 · 第 001 期</p>
-        <h1 style={{ ...mastheadStyle, marginTop: "var(--space-2)" }}>
-          看
+      {/* HERO — editorial spread */}
+      <section style={heroStyle} aria-label="看懂一下">
+        <span className="kd-section-eyebrow">为爸妈而做 · For Parents</span>
+        <h1 style={heroDisplayStyle}>
+          看懂
           <br />
-          懂
-          <br />
-          一<br />
-          下
+          一下
         </h1>
-        <hr
-          aria-hidden="true"
-          style={{
-            border: 0,
-            height: "var(--rule-heavy)",
-            background: "var(--color-rule)",
-            margin: "var(--space-3) 0",
-          }}
-        />
-        <p style={subheadStyle}>
-          上传一张<span style={{ background: "var(--color-yellow)", padding: "0 0.15em" }}>可疑截图</span>
-          ，AI 用大字加语音
+        <p style={heroSubStyle}>
+          上传一张可疑截图,<br />
+          AI 用大字加语音<br />
           告诉您「是不是骗子」。
         </p>
+        <hr className="kd-hair" />
       </section>
 
-      {/* HERO RISK灯 SAMPLE */}
-      <section
-        aria-label="风险灯示例"
-        style={{ marginTop: "var(--space-2)" }}
-      >
-        <p
-          style={{
-            ...eyebrowStyle,
-            marginBottom: "var(--space-2)",
-            color: "var(--color-muted)",
-          }}
-        >
-          看一眼就知道 · risk at a glance
-        </p>
-        <div style={heroBlockStyle}>
-          <div aria-hidden="true" style={heroGlyphStyle}>
-            红
-          </div>
-          <div style={heroLabelStyle}>
-            <span
-              style={{
-                fontSize: "var(--text-eyebrow)",
-                fontWeight: 800,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                opacity: 0.85,
-              }}
-            >
-              STOP · 高风险
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(2rem, 1.4rem + 2.6vw, 3rem)",
-                fontWeight: 900,
-                lineHeight: 0.95,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              钱进去就回不来
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA STACK */}
+      {/* CTA STACK — hanging serif numerals over editorial label rows */}
       <section
         aria-label="开始扫描"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--space-2)",
-          marginTop: "var(--space-2)",
+          gap: "var(--space-4)",
         }}
       >
-        <p style={eyebrowStyle}>开始 · start here</p>
+        <span className="kd-section-eyebrow">开始 · Start Here</span>
+
         <BigButton
           onClick={() => startStubbedScan("camera")}
           disabled={navigating !== null}
@@ -257,12 +177,11 @@ export function HomeView() {
               aria-hidden="true"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-numeral)",
-                fontWeight: 900,
-                lineHeight: 0.8,
-                color: "var(--color-bg)",
-                opacity: 0.55,
-                minWidth: "1.2em",
+                fontSize: 44,
+                fontWeight: 400,
+                lineHeight: 1,
+                color: "var(--color-amethyst-ink)",
+                minWidth: "1.4em",
               }}
             >
               一
@@ -271,6 +190,7 @@ export function HomeView() {
         >
           {navigating === "camera" ? "打开相机…" : "拍照看一下"}
         </BigButton>
+
         <BigButton
           variant="secondary"
           onClick={() => startStubbedScan("album")}
@@ -280,12 +200,11 @@ export function HomeView() {
               aria-hidden="true"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-numeral)",
-                fontWeight: 900,
-                lineHeight: 0.8,
-                color: "var(--color-fg)",
-                opacity: 0.4,
-                minWidth: "1.2em",
+                fontSize: 44,
+                fontWeight: 400,
+                lineHeight: 1,
+                color: "var(--color-ink)",
+                minWidth: "1.4em",
               }}
             >
               二
@@ -294,6 +213,7 @@ export function HomeView() {
         >
           {navigating === "album" ? "打开相册…" : "从相册选"}
         </BigButton>
+
         <BigButton
           variant="ghost"
           onClick={() => setPickerOpen((v) => !v)}
@@ -306,12 +226,11 @@ export function HomeView() {
               aria-hidden="true"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-numeral)",
-                fontWeight: 900,
-                lineHeight: 0.8,
-                color: "var(--color-fg)",
-                opacity: 0.4,
-                minWidth: "1.2em",
+                fontSize: 44,
+                fontWeight: 400,
+                lineHeight: 1,
+                color: "var(--color-muted)",
+                minWidth: "1.4em",
               }}
             >
               三
@@ -327,24 +246,23 @@ export function HomeView() {
           id="kd-demo-picker"
           aria-label="演示案例选择"
           style={{
-            marginTop: "var(--space-2)",
-            borderTop: "var(--rule-heavy) solid var(--color-rule)",
-            paddingTop: "var(--space-3)",
             display: "flex",
             flexDirection: "column",
-            gap: "var(--space-2)",
+            gap: "var(--space-4)",
+            paddingTop: "var(--space-5)",
+            borderTop: "2px solid var(--color-ink)",
           }}
         >
-          <p style={eyebrowStyle}>样张目录 · case archive</p>
+          <span className="kd-section-eyebrow">样张目录 · Case Archive</span>
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-title)",
-              fontWeight: 900,
+              fontSize: "clamp(32px, 9vw, 44px)",
+              fontWeight: 400,
               letterSpacing: "-0.02em",
-              lineHeight: 1,
+              lineHeight: 1.05,
               margin: 0,
-              marginBottom: "var(--space-2)",
+              color: "var(--color-ink)",
             }}
           >
             点一个看看
@@ -359,38 +277,48 @@ export function HomeView() {
               正在加载例子…
             </p>
           ) : (
-            options.map((opt) => (
-              <BigButton
-                key={opt.id}
-                as="a"
-                href={`/scan?demo=${opt.id}`}
-                variant="secondary"
-                leading={
-                  <span
-                    aria-hidden="true"
+            <ul className="kd-ruled-list" aria-label="演示案例">
+              {options.map((opt) => (
+                <li key={opt.id}>
+                  <span aria-hidden="true">
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 56,
+                        height: 56,
+                        borderRadius: "var(--radius-lg)",
+                        background: LEVEL_BG[opt.level],
+                        color: LEVEL_INK[opt.level],
+                        fontFamily: "var(--font-display)",
+                        fontSize: 32,
+                        fontWeight: 400,
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {LEVEL_GLYPH[opt.level]}
+                    </span>
+                  </span>
+                  <a
+                    href={`/scan?demo=${opt.id}`}
                     style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      minWidth: 56,
-                      height: 56,
-                      padding: "0 var(--space-2)",
-                      background: LEVEL_BG[opt.level],
-                      color: LEVEL_TEXT[opt.level],
                       fontFamily: "var(--font-display)",
-                      fontSize: "var(--text-button)",
-                      fontWeight: 900,
-                      letterSpacing: "-0.02em",
-                      border: "var(--rule-medium) solid var(--color-rule)",
+                      fontSize: "clamp(22px, 6vw, 28px)",
+                      fontWeight: 400,
+                      letterSpacing: "-0.01em",
+                      lineHeight: 1.2,
+                      color: "var(--color-ink)",
+                      textDecoration: "none",
+                      borderBottom: "1px solid currentColor",
+                      paddingBottom: 2,
                     }}
                   >
-                    {LEVEL_LABEL[opt.level]}
-                  </span>
-                }
-              >
-                {opt.title}
-              </BigButton>
-            ))
+                    {opt.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
           )}
         </section>
       ) : null}

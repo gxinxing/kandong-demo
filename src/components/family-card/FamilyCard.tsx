@@ -14,7 +14,9 @@ const CANVAS_HEIGHT = 1920;
 
 interface LevelPalette {
   accent: string;
-  onAccent: string;
+  accentInk: string;
+  tint: string;
+  tintInk: string;
   glyph: string;
   label: string;
   shout: string;
@@ -23,36 +25,48 @@ interface LevelPalette {
 const LEVEL_PALETTE: Record<DemoLevel, LevelPalette> = {
   red: {
     accent: "#c0162a",
-    onAccent: "#fff5f0",
+    accentInk: "#fff5f0",
+    tint: "#fbe6e4",
+    tintInk: "#5a0a16",
     glyph: "红",
     label: "高风险",
     shout: "STOP",
   },
   yellow: {
     accent: "#d68b00",
-    onAccent: "#1a1000",
+    accentInk: "#1a1000",
+    tint: "#fbf2e1",
+    tintInk: "#4a3000",
     glyph: "黄",
     label: "要警惕",
     shout: "WAIT",
   },
   green: {
     accent: "#1e6a32",
-    onAccent: "#f0fff5",
+    accentInk: "#f0fff5",
+    tint: "#e6f2e9",
+    tintInk: "#0e3a1a",
     glyph: "绿",
     label: "安全",
     shout: "OK",
   },
 };
 
-const PAPER = "#f5f0e6";
-const INK = "#161616";
-const RULE = "#161616";
-const MUTED = "#5a5045";
+const CANVAS_BG = "#f5f2f0";
+const SURFACE = "#ffffff";
+const INK = "#000000";
+const FG = "#333333";
+const MUTED = "#7b7b7b";
+const BORDER = "#d6d6d6";
+const AMETHYST = "#f1ccff";
+const AMETHYST_INK = "#4a1166";
+const SKY = "#91e0ff";
+const SKY_INK = "#0a4a66";
 
 const DISPLAY_STACK =
-  '"Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "STSong", "SimSun", "PingFang SC", serif';
+  '"Fraunces", "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "STSong", "SimSun", "PingFang SC", serif';
 const SANS_STACK =
-  '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", "Heiti SC", system-ui, sans-serif';
+  '"Switzer", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", system-ui, sans-serif';
 
 const DEPLOY_BASE_URL = "https://kandong.ai.syt.huickathon.cn";
 
@@ -86,257 +100,282 @@ function formatTodayLong(): string {
   return `${y}·${m}·${day}`;
 }
 
+function roundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+function drawTrackedText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  track = 4,
+): void {
+  let cursor = x;
+  for (const ch of text) {
+    ctx.fillText(ch, cursor, y);
+    cursor += ctx.measureText(ch).width + track;
+  }
+}
+
 function drawCard(canvas: HTMLCanvasElement, caseData: DemoCase): void {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   const palette = LEVEL_PALETTE[caseData.level];
 
-  // ===== Background: warm newsprint =====
-  ctx.fillStyle = PAPER;
+  // Background — cream cloud canvas
+  ctx.fillStyle = CANVAS_BG;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  // Subtle dot grain
-  ctx.fillStyle = "rgba(22, 22, 22, 0.04)";
-  for (let y = 8; y < CANVAS_HEIGHT; y += 18) {
-    for (let x = 8; x < CANVAS_WIDTH; x += 18) {
-      ctx.fillRect(x, y, 2, 2);
-    }
-  }
+  // Porcelain card with soft drop shadow
+  const cardMargin = 50;
+  const cardX = cardMargin;
+  const cardY = cardMargin;
+  const cardW = CANVAS_WIDTH - cardMargin * 2;
+  const cardH = CANVAS_HEIGHT - cardMargin * 2;
+  const cardRadius = 42;
 
-  const margin = 70;
-  const innerW = CANVAS_WIDTH - margin * 2;
+  ctx.save();
+  ctx.shadowColor = "rgba(0, 0, 0, 0.06)";
+  ctx.shadowBlur = 36;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 12;
+  ctx.fillStyle = SURFACE;
+  roundedRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
+  ctx.fill();
+  ctx.restore();
 
-  // ===== MASTHEAD STRIP =====
+  const pad = 70;
+  const innerX = cardX + pad;
+  const innerW = cardW - pad * 2;
+  const innerRight = innerX + innerW;
+
+  // Masthead eyebrow row
   ctx.textBaseline = "alphabetic";
-  ctx.font = `800 30px ${SANS_STACK}`;
-  ctx.fillStyle = INK;
+  ctx.font = `600 26px ${SANS_STACK}`;
+  ctx.fillStyle = MUTED;
   ctx.textAlign = "left";
-  // Letter-spaced eyebrow
-  const drawTrackedText = (text: string, x: number, y: number, track = 6) => {
-    let cursor = x;
-    for (const ch of text) {
-      ctx.fillText(ch, cursor, y);
-      cursor += ctx.measureText(ch).width + track;
-    }
-  };
-  drawTrackedText("KANDONG · 反诈助手", margin, 110, 4);
-  ctx.textAlign = "right";
-  ctx.font = `800 28px ${SANS_STACK}`;
-  ctx.fillText(formatTodayLong(), CANVAS_WIDTH - margin, 110);
+  drawTrackedText(ctx, "KANDONG · 反诈助手", innerX, cardY + 110, 3.5);
 
-  // Heavy rule under masthead
-  ctx.fillStyle = RULE;
-  ctx.fillRect(margin, 140, innerW, 6);
+  ctx.textAlign = "right";
+  ctx.fillText(formatTodayLong(), innerRight, cardY + 110);
 
   // Hair rule
-  ctx.fillRect(margin, 156, innerW, 2);
+  ctx.fillStyle = BORDER;
+  ctx.fillRect(innerX, cardY + 140, innerW, 1);
 
   // Section eyebrow
   ctx.textAlign = "left";
-  ctx.font = `800 32px ${SANS_STACK}`;
+  ctx.font = `600 28px ${SANS_STACK}`;
   ctx.fillStyle = MUTED;
-  drawTrackedText("给家人的提醒 · A NOTE FOR FAMILY", margin, 220, 4);
+  drawTrackedText(ctx, "给家人的提醒 · A NOTE FOR FAMILY", innerX, cardY + 210, 3.5);
 
-  // ===== KICKER (level shout) =====
-  ctx.font = `800 36px ${SANS_STACK}`;
+  // Kicker — level shout in accent color
+  ctx.font = `600 32px ${SANS_STACK}`;
   ctx.fillStyle = palette.accent;
-  ctx.textAlign = "left";
-  drawTrackedText(`${palette.shout} · ${palette.label}`, margin, 290, 6);
-
-  // ===== POSTER BLOCK: huge glyph + label =====
-  const posterY = 320;
-  const posterH = 280;
-  ctx.fillStyle = palette.accent;
-  ctx.fillRect(margin, posterY, innerW, posterH);
-  // Hard offset shadow effect — black slab behind, achieved by drawing a black
-  // rect at margin+8 first and the color block on top. We already drew the
-  // color block, so add a thin black border + offset shadow stripe.
-  ctx.fillStyle = RULE;
-  ctx.fillRect(margin + 14, posterY + posterH, innerW, 14); // bottom slab
-  ctx.fillRect(margin + innerW, posterY + 14, 14, posterH); // right slab
-  // Outline
-  ctx.strokeStyle = RULE;
-  ctx.lineWidth = 4;
-  ctx.strokeRect(margin, posterY, innerW, posterH);
-
-  // Glyph
-  ctx.fillStyle = palette.onAccent;
-  ctx.font = `900 240px ${DISPLAY_STACK}`;
-  ctx.textBaseline = "alphabetic";
-  ctx.textAlign = "left";
-  ctx.fillText(palette.glyph, margin + 40, posterY + posterH - 50);
-
-  // Divider line inside poster
-  ctx.fillStyle = palette.onAccent;
-  ctx.fillRect(margin + 290, posterY + 40, 4, posterH - 80);
-
-  // Inside-poster headline (case title)
-  ctx.font = `900 64px ${DISPLAY_STACK}`;
-  ctx.textBaseline = "top";
-  const titleX = margin + 320;
-  const titleMaxW = innerW - 320 - 40;
-  const titleLines = wrapText(ctx, caseData.title, titleMaxW).slice(0, 2);
-  let ty = posterY + 60;
-  for (const line of titleLines) {
-    ctx.fillText(line, titleX, ty);
-    ty += 72;
-  }
-
-  // Inside-poster small label
-  ctx.font = `800 26px ${SANS_STACK}`;
-  ctx.textBaseline = "alphabetic";
   drawTrackedText(
-    palette.label.toUpperCase(),
-    titleX,
-    posterY + posterH - 40,
-    6,
+    ctx,
+    `${palette.shout} · ${palette.label}`,
+    innerX,
+    cardY + 270,
+    4,
   );
 
-  let cursorY = posterY + posterH + 60;
+  // Risk poster — rounded swatch + serif title
+  const swatchSize = 220;
+  const swatchY = cardY + 310;
+  ctx.fillStyle = palette.accent;
+  roundedRect(ctx, innerX, swatchY, swatchSize, swatchSize, 32);
+  ctx.fill();
 
-  // ===== HEADLINE: one-line verdict =====
-  ctx.fillStyle = INK;
-  ctx.font = `900 84px ${DISPLAY_STACK}`;
+  // Glyph on swatch — serif
+  ctx.fillStyle = palette.accentInk;
+  ctx.font = `400 170px ${DISPLAY_STACK}`;
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  ctx.fillText(palette.glyph, innerX + swatchSize / 2, swatchY + swatchSize / 2 + 6);
+
+  // Right of swatch — case title (serif) wraps to 2 lines
   ctx.textBaseline = "top";
   ctx.textAlign = "left";
+  const titleX = innerX + swatchSize + 40;
+  const titleMaxW = innerRight - titleX;
+
+  // small eyebrow above title
+  ctx.font = `600 22px ${SANS_STACK}`;
+  ctx.fillStyle = MUTED;
+  drawTrackedText(ctx, "CASE", titleX, swatchY + 18, 4);
+
+  ctx.font = `400 58px ${DISPLAY_STACK}`;
+  ctx.fillStyle = INK;
+  const titleLines = wrapText(ctx, caseData.title, titleMaxW).slice(0, 3);
+  let ty = swatchY + 60;
+  for (const line of titleLines) {
+    ctx.fillText(line, titleX, ty);
+    ty += 68;
+  }
+
+  let cursorY = swatchY + swatchSize + 60;
+
+  // Verdict — large serif headline
+  ctx.fillStyle = INK;
+  ctx.font = `400 72px ${DISPLAY_STACK}`;
+  ctx.textBaseline = "top";
   const summaryLines = wrapText(ctx, caseData.summary, innerW);
   for (const line of summaryLines) {
-    ctx.fillText(line, margin, cursorY);
-    cursorY += 100;
+    ctx.fillText(line, innerX, cursorY);
+    cursorY += 84;
   }
-  cursorY += 12;
+  cursorY += 20;
 
-  // Hair rule
-  ctx.fillStyle = RULE;
-  ctx.fillRect(margin, cursorY, innerW, 2);
-  cursorY += 30;
+  // Why callout — tinted soft card
+  const whyLines = wrapText(ctx, caseData.why, innerW - 60);
+  const whyBodyH = whyLines.length * 50 + 20;
+  const whyH = whyBodyH + 90;
+  ctx.fillStyle = palette.tint;
+  roundedRect(ctx, innerX, cursorY, innerW, whyH, 28);
+  ctx.fill();
 
-  // ===== WHY callout — paper card with colored left bar =====
-  ctx.font = `800 28px ${SANS_STACK}`;
-  ctx.fillStyle = palette.accent;
+  ctx.font = `600 24px ${SANS_STACK}`;
+  ctx.fillStyle = palette.tintInk;
   ctx.textBaseline = "alphabetic";
-  drawTrackedText("为什么 · WHY", margin, cursorY + 30, 4);
-  cursorY += 60;
+  drawTrackedText(ctx, "为什么 · WHY", innerX + 30, cursorY + 48, 3);
 
-  // Colored bar
-  const whyLines = wrapText(ctx, caseData.why, innerW - 50);
-  const whyH = whyLines.length * 56 + 40;
-  ctx.fillStyle = palette.accent;
-  ctx.fillRect(margin, cursorY, 12, whyH);
-  ctx.fillStyle = INK;
-  ctx.font = `600 40px ${SANS_STACK}`;
+  ctx.font = `400 34px ${SANS_STACK}`;
+  ctx.fillStyle = FG;
   ctx.textBaseline = "top";
-  let wy = cursorY + 14;
+  let wy = cursorY + 70;
   for (const line of whyLines) {
-    ctx.fillText(line, margin + 36, wy);
-    wy += 56;
+    ctx.fillText(line, innerX + 30, wy);
+    wy += 50;
   }
   cursorY += whyH + 50;
 
-  // ===== POINTS — hanging numerals 一 二 三 =====
-  ctx.font = `800 30px ${SANS_STACK}`;
+  // Three rules section header
+  ctx.font = `600 26px ${SANS_STACK}`;
   ctx.fillStyle = MUTED;
   ctx.textBaseline = "alphabetic";
-  drawTrackedText("记住三件事 · REMEMBER", margin, cursorY, 4);
-  cursorY += 24;
-  ctx.fillStyle = RULE;
-  ctx.fillRect(margin, cursorY, innerW, 4);
+  drawTrackedText(ctx, "记住三件事 · REMEMBER", innerX, cursorY, 3.5);
   cursorY += 24;
 
+  // Points — porcelain mini-cards with amethyst serif numerals
   for (let i = 0; i < caseData.points.length; i += 1) {
     const point = caseData.points[i];
     const numeral = HANGING_NUMERAL[i] ?? String(i + 1);
 
-    // Hanging display numeral
-    ctx.font = `900 120px ${DISPLAY_STACK}`;
-    ctx.fillStyle = palette.accent;
-    ctx.textBaseline = "top";
-    ctx.fillText(numeral, margin, cursorY);
-
-    // Point text
-    ctx.font = `600 44px ${SANS_STACK}`;
-    ctx.fillStyle = INK;
-    const ptX = margin + 150;
+    ctx.font = `400 36px ${SANS_STACK}`;
+    const ptX = innerX + 130;
     const ptMaxW = innerW - 150;
     const ptLines = wrapText(ctx, point, ptMaxW);
-    let py = cursorY + 18;
+    const blockH = Math.max(120, ptLines.length * 52 + 40);
+
+    // Card background — soft canvas tint with subtle border
+    ctx.fillStyle = CANVAS_BG;
+    roundedRect(ctx, innerX, cursorY, innerW, blockH, 24);
+    ctx.fill();
+    ctx.strokeStyle = BORDER;
+    ctx.lineWidth = 1;
+    roundedRect(ctx, innerX, cursorY, innerW, blockH, 24);
+    ctx.stroke();
+
+    // Hanging serif numeral
+    ctx.font = `400 90px ${DISPLAY_STACK}`;
+    ctx.fillStyle = AMETHYST_INK;
+    ctx.textBaseline = "top";
+    ctx.fillText(numeral, innerX + 30, cursorY + 16);
+
+    // Point body
+    ctx.font = `400 34px ${SANS_STACK}`;
+    ctx.fillStyle = FG;
+    let py = cursorY + 24;
     for (const line of ptLines) {
       ctx.fillText(line, ptX, py);
-      py += 62;
+      py += 52;
     }
-    const blockH = Math.max(120, ptLines.length * 62 + 18);
-    cursorY += blockH + 16;
 
-    // Hair rule between points
-    if (i < caseData.points.length - 1) {
-      ctx.fillStyle = "#c8bea8";
-      ctx.fillRect(margin, cursorY, innerW, 1);
-      cursorY += 20;
-    }
+    cursorY += blockH + 18;
   }
-  cursorY += 24;
+  cursorY += 16;
 
-  // ===== ACTION BAND — black slab =====
-  const actionLines = wrapText(ctx, caseData.action, innerW - 80);
-  const actionH = 80 + actionLines.length * 70 + 40;
-  ctx.fillStyle = INK;
-  ctx.fillRect(margin, cursorY, innerW, actionH);
-  // Offset slab
-  ctx.fillStyle = palette.accent;
-  ctx.fillRect(margin + 14, cursorY + actionH, innerW, 14);
-  ctx.fillRect(margin + innerW, cursorY + 14, 14, actionH);
+  // Action band — sky-blue rounded card
+  const actionLines = wrapText(ctx, caseData.action, innerW - 100);
+  const actionH = 100 + actionLines.length * 60 + 40;
+  ctx.fillStyle = SKY;
+  roundedRect(ctx, innerX, cursorY, innerW, actionH, 36);
+  ctx.fill();
 
-  ctx.fillStyle = palette.accent;
-  ctx.font = `800 28px ${SANS_STACK}`;
+  ctx.fillStyle = SKY_INK;
+  ctx.font = `600 24px ${SANS_STACK}`;
   ctx.textBaseline = "alphabetic";
-  drawTrackedText("现在该怎么办 · NEXT STEP", margin + 40, cursorY + 60, 4);
+  drawTrackedText(ctx, "现在该怎么办 · NEXT STEP", innerX + 50, cursorY + 60, 3.5);
 
-  ctx.fillStyle = palette.onAccent;
-  ctx.font = `900 54px ${DISPLAY_STACK}`;
+  ctx.font = `400 46px ${DISPLAY_STACK}`;
   ctx.textBaseline = "top";
   let ay = cursorY + 90;
   for (const line of actionLines) {
-    ctx.fillText(line, margin + 40, ay);
-    ay += 70;
+    ctx.fillText(line, innerX + 50, ay);
+    ay += 60;
   }
   cursorY += actionH + 60;
 
-  // ===== FOOTER =====
-  // Hair rule
-  ctx.fillStyle = RULE;
-  ctx.fillRect(margin, CANVAS_HEIGHT - 240, innerW, 4);
+  // Footer — brand + url + rounded QR
+  const footerY = cardY + cardH - 240;
 
-  // Brand block
-  ctx.font = `900 56px ${DISPLAY_STACK}`;
+  // Hair rule
+  ctx.fillStyle = BORDER;
+  ctx.fillRect(innerX, footerY, innerW, 1);
+
+  // Brand serif
+  ctx.font = `400 52px ${DISPLAY_STACK}`;
   ctx.fillStyle = INK;
   ctx.textBaseline = "alphabetic";
   ctx.textAlign = "left";
-  ctx.fillText("看·懂·一·下", margin, CANVAS_HEIGHT - 160);
+  ctx.fillText("看懂一下", innerX, footerY + 80);
 
-  ctx.font = `700 28px ${SANS_STACK}`;
+  ctx.font = `600 24px ${SANS_STACK}`;
   ctx.fillStyle = MUTED;
-  drawTrackedText("给爸妈的反诈助手", margin, CANVAS_HEIGHT - 110, 2);
+  drawTrackedText(ctx, "给爸妈的反诈助手", innerX, footerY + 122, 2);
 
-  ctx.font = `500 24px ${SANS_STACK}`;
+  ctx.font = `500 22px ${SANS_STACK}`;
   ctx.fillStyle = MUTED;
   ctx.fillText(
     `${DEPLOY_BASE_URL}/result/${caseData.id}`,
-    margin,
-    CANVAS_HEIGHT - 70,
+    innerX,
+    footerY + 168,
   );
 
-  // QR placeholder — black ink block
-  const qrSize = 160;
-  const qrX = CANVAS_WIDTH - qrSize - margin;
-  const qrY = CANVAS_HEIGHT - qrSize - 70;
-  ctx.fillStyle = INK;
-  ctx.fillRect(qrX, qrY, qrSize, qrSize);
-  ctx.fillStyle = PAPER;
-  ctx.font = `800 24px ${SANS_STACK}`;
+  // QR placeholder — rounded amethyst block
+  const qrSize = 150;
+  const qrX = innerRight - qrSize;
+  const qrY = footerY + 50;
+  ctx.fillStyle = AMETHYST;
+  roundedRect(ctx, qrX, qrY, qrSize, qrSize, 20);
+  ctx.fill();
+
+  ctx.fillStyle = AMETHYST_INK;
+  ctx.font = `600 22px ${SANS_STACK}`;
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
-  ctx.fillText("扫码", qrX + qrSize / 2, qrY + qrSize / 2 - 16);
-  ctx.fillText("看详情", qrX + qrSize / 2, qrY + qrSize / 2 + 20);
+  ctx.fillText("扫码", qrX + qrSize / 2, qrY + qrSize / 2 - 14);
+  ctx.fillText("看详情", qrX + qrSize / 2, qrY + qrSize / 2 + 18);
 }
 
 const canvasStyle: CSSProperties = {
@@ -346,9 +385,9 @@ const canvasStyle: CSSProperties = {
   height: "auto",
   aspectRatio: "1080 / 1920",
   margin: "0 auto",
-  background: "var(--color-paper)",
-  border: "var(--rule-medium) solid var(--color-rule)",
-  boxShadow: "0 1px 0 var(--color-rule), 6px 6px 0 var(--color-rule)",
+  background: "var(--color-canvas)",
+  borderRadius: "var(--radius-2xl)",
+  boxShadow: "var(--shadow-card)",
 };
 
 export function FamilyCard({ caseData }: FamilyCardProps) {
@@ -437,7 +476,7 @@ export function FamilyCard({ caseData }: FamilyCardProps) {
           style={{
             color: "var(--color-red)",
             fontSize: "var(--text-body)",
-            fontWeight: 700,
+            fontWeight: 600,
             textAlign: "center",
           }}
         >

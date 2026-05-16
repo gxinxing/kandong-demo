@@ -13,9 +13,10 @@ interface RiskBadgeConfig {
   label: string;
   shout: string;
   ariaLabel: string;
-  bg: string;
-  ink: string;
-  text: string;
+  swatchBg: string;
+  swatchInk: string;
+  cardTint: string;
+  posterInk: string;
 }
 
 const RISK_CONFIG: Record<RiskLevel, RiskBadgeConfig> = {
@@ -23,36 +24,33 @@ const RISK_CONFIG: Record<RiskLevel, RiskBadgeConfig> = {
     glyph: "红",
     label: "高风险",
     shout: "STOP",
-    ariaLabel: "高风险警告，这是骗局",
-    bg: "var(--color-red)",
-    ink: "var(--color-red-ink)",
-    text: "#fff5f0",
+    ariaLabel: "高风险警告,这是骗局",
+    swatchBg: "var(--color-red)",
+    swatchInk: "#fff5f0",
+    cardTint: "var(--color-red-soft)",
+    posterInk: "var(--color-red)",
   },
   yellow: {
     glyph: "黄",
     label: "要警惕",
     shout: "WAIT",
-    ariaLabel: "要警惕，可能有风险",
-    bg: "var(--color-yellow)",
-    ink: "var(--color-yellow-ink)",
-    text: "#1a1000",
+    ariaLabel: "要警惕,可能有风险",
+    swatchBg: "var(--color-yellow)",
+    swatchInk: "#1a1000",
+    cardTint: "var(--color-yellow-soft)",
+    posterInk: "#8a5a00",
   },
   green: {
     glyph: "绿",
     label: "安全",
     shout: "OK",
-    ariaLabel: "安全，未发现风险",
-    bg: "var(--color-green)",
-    ink: "var(--color-green-ink)",
-    text: "#f0fff5",
+    ariaLabel: "安全,未发现风险",
+    swatchBg: "var(--color-green)",
+    swatchInk: "#f0fff5",
+    cardTint: "var(--color-green-soft)",
+    posterInk: "var(--color-green)",
   },
 };
-
-const SIZE_MAP = {
-  lg: { box: 200, glyph: "120px", label: "var(--text-button)" },
-  xl: { box: 260, glyph: "168px", label: "var(--text-title)" },
-  poster: { box: 0, glyph: "0", label: "0" },
-} as const;
 
 export function RiskBadge({
   level,
@@ -61,119 +59,148 @@ export function RiskBadge({
 }: RiskBadgeProps) {
   const config = RISK_CONFIG[level];
 
-  // Poster variant — full-bleed editorial color block with hanging label.
+  // Poster — editorial risk-poster: oversized Fraunces glyph stamped behind
+  // the verdict label, with hairline rules framing the metadata. No plastic
+  // rounded square, no shadow soup.
   if (size === "poster") {
-    const blockStyle: CSSProperties = {
-      background: config.bg,
-      color: config.text,
-      padding: "var(--space-4) var(--space-3)",
-      display: "grid",
-      gridTemplateColumns: "auto 1fr",
-      alignItems: "stretch",
-      gap: "var(--space-3)",
-      boxShadow: `0 1px 0 var(--color-rule), 6px 6px 0 var(--color-rule)`,
-      borderRadius: 0,
+    const cardStyle: CSSProperties = {
       position: "relative",
+      borderTop: "2px solid var(--color-ink)",
+      borderBottom: "1px solid var(--color-border)",
+      paddingTop: "var(--space-4)",
+      paddingBottom: "var(--space-6)",
+      overflow: "hidden",
+      isolation: "isolate",
+    };
+    const watermarkStyle: CSSProperties = {
+      position: "absolute",
+      right: "-3vw",
+      bottom: "-2vw",
+      fontFamily: "var(--font-display)",
+      fontSize: "clamp(260px, 75vw, 360px)",
+      fontWeight: 400,
+      lineHeight: 0.78,
+      letterSpacing: "-0.04em",
+      color: config.posterInk,
+      opacity: 0.95,
+      zIndex: 0,
+      pointerEvents: "none",
+      userSelect: "none",
+    };
+    const labelStackStyle: CSSProperties = {
+      position: "relative",
+      zIndex: 1,
+      display: "flex",
+      flexDirection: "column",
+      gap: "var(--space-4)",
+      minHeight: "min(72vw, 320px)",
+      justifyContent: "space-between",
+    };
+    const shoutStyle: CSSProperties = {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "baseline",
+      fontFamily: "var(--font-sans)",
+      fontSize: 12,
+      fontWeight: 600,
+      letterSpacing: "0.22em",
+      textTransform: "uppercase",
+      color: "var(--color-muted)",
+    };
+    const labelStyle: CSSProperties = {
+      fontFamily: "var(--font-display)",
+      fontSize: "clamp(56px, 18vw, 84px)",
+      fontWeight: 400,
+      lineHeight: 0.95,
+      letterSpacing: "-0.03em",
+      color: "var(--color-ink)",
+      margin: 0,
+    };
+    const verdictStyle: CSSProperties = {
+      fontFamily: "var(--font-sans)",
+      fontSize: 14,
+      fontWeight: 600,
+      letterSpacing: "0.16em",
+      textTransform: "uppercase",
+      color: config.posterInk,
+      mixBlendMode: "multiply",
     };
     return (
       <div
         role="img"
         aria-label={config.ariaLabel}
         className={className}
-        style={blockStyle}
+        style={cardStyle}
       >
-        <div
-          aria-hidden="true"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(6rem, 4rem + 12vw, 11rem)",
-            fontWeight: 900,
-            lineHeight: 0.85,
-            letterSpacing: "-0.04em",
-            color: config.text,
-            paddingRight: "var(--space-2)",
-            borderRight: `var(--rule-medium) solid ${config.text}`,
-          }}
-        >
+        <span aria-hidden="true" style={watermarkStyle}>
           {config.glyph}
-        </div>
-        <div
-          aria-hidden="true"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            paddingLeft: "var(--space-1)",
-            gap: "var(--space-2)",
-          }}
-        >
-          <span
+        </span>
+        <div style={labelStackStyle}>
+          <div style={shoutStyle}>
+            <span>RISK · 风险</span>
+            <span>{config.shout}</span>
+          </div>
+          <div
             style={{
-              fontSize: "var(--text-eyebrow)",
-              fontWeight: 800,
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              opacity: 0.85,
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--space-2)",
             }}
           >
-            {config.shout}
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(2.5rem, 1.8rem + 3vw, 4rem)",
-              fontWeight: 900,
-              lineHeight: 0.95,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {config.label}
-          </span>
+            <span style={verdictStyle}>VERDICT</span>
+            <span style={labelStyle}>{config.label}</span>
+          </div>
         </div>
       </div>
     );
   }
 
-  const dims = SIZE_MAP[size];
+  // Standard rounded swatch (lg/xl) — kept for smaller surfaces (cards, lists).
+  const dims =
+    size === "xl"
+      ? { box: 220, glyph: 156, labelSize: "var(--text-title)" }
+      : { box: 168, glyph: 116, labelSize: "var(--text-button)" };
 
   const wrapperStyle: CSSProperties = {
+    display: "inline-flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "var(--space-3)",
+  };
+  const swatchStyle: CSSProperties = {
     width: dims.box,
     height: dims.box,
-    background: config.bg,
-    color: config.text,
-    boxShadow: `inset 0 0 0 0px transparent, 6px 6px 0 var(--color-rule)`,
-    borderRadius: 0,
+    background: config.swatchBg,
+    color: config.swatchInk,
+    borderRadius: "var(--radius-3xl)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     fontFamily: "var(--font-display)",
+    fontSize: dims.glyph,
+    fontWeight: 400,
+    lineHeight: 1,
+    letterSpacing: "-0.02em",
   };
 
   return (
     <div
       role="img"
       aria-label={config.ariaLabel}
-      className={`flex flex-col items-center justify-center select-none ${
-        className ?? ""
-      }`}
+      className={`select-none ${className ?? ""}`}
       style={wrapperStyle}
     >
-      <span
-        aria-hidden="true"
-        style={{
-          fontSize: dims.glyph,
-          fontWeight: 900,
-          lineHeight: 0.85,
-          letterSpacing: "-0.04em",
-        }}
-      >
+      <div aria-hidden="true" style={swatchStyle}>
         {config.glyph}
-      </span>
+      </div>
       <span
         aria-hidden="true"
         style={{
-          fontSize: dims.label,
-          fontWeight: 900,
-          marginTop: "0.15em",
-          letterSpacing: "-0.01em",
           fontFamily: "var(--font-display)",
+          fontSize: dims.labelSize,
+          fontWeight: 400,
+          letterSpacing: "-0.01em",
+          color: "var(--color-ink)",
         }}
       >
         {config.label}

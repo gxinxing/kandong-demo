@@ -61,59 +61,67 @@ export function ScanView() {
     };
   }, [demoId, router]);
 
-  const eyebrowStyle: CSSProperties = {
-    fontSize: "var(--text-eyebrow)",
-    fontWeight: 800,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: "var(--color-muted)",
-    textAlign: "center",
-  };
-
-  const stackHeadlineStyle: CSSProperties = {
+  // Editorial scan — typographic. Big Fraunces percentage acts as the visual
+  // anchor; dot grid sits on page atmosphere; thin amethyst rule progresses
+  // beneath everything as a hair-rule readout.
+  const headlineStyle: CSSProperties = {
     fontFamily: "var(--font-display)",
-    fontSize: "var(--text-hero)",
-    fontWeight: 900,
-    lineHeight: 0.9,
-    letterSpacing: "-0.03em",
-    color: "var(--color-fg)",
-    textAlign: "center",
+    fontSize: "clamp(72px, 22vw, 108px)",
+    fontWeight: 400,
+    lineHeight: 0.92,
+    letterSpacing: "-0.04em",
+    color: "var(--color-ink)",
     margin: 0,
-    marginTop: "var(--space-3)",
   };
 
   const subStyle: CSSProperties = {
-    fontSize: "var(--text-body)",
-    color: "var(--color-muted)",
-    textAlign: "center",
-    marginTop: "var(--space-2)",
+    fontFamily: "var(--font-display)",
+    fontStyle: "italic",
+    fontSize: "clamp(20px, 5.5vw, 26px)",
+    fontWeight: 400,
+    lineHeight: 1.3,
+    color: "var(--color-fg)",
+    margin: 0,
+  };
+
+  const percentStyle: CSSProperties = {
+    fontFamily: "var(--font-display)",
+    fontSize: "clamp(140px, 40vw, 200px)",
+    fontWeight: 400,
+    lineHeight: 0.85,
+    letterSpacing: "-0.05em",
+    color: "var(--color-ink)",
+    margin: 0,
+    textAlign: "right",
+  };
+
+  const percentSubStyle: CSSProperties = {
+    fontFamily: "var(--font-sans)",
+    fontSize: 11,
     fontWeight: 600,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: "var(--color-muted)",
+    display: "block",
+    textAlign: "right",
+    marginTop: "var(--space-2)",
   };
 
   const progressTrackStyle: CSSProperties = {
-    marginTop: "var(--space-4)",
-    height: 18,
+    position: "relative",
+    height: 2,
     width: "100%",
-    background: "var(--color-paper)",
-    border: "var(--rule-medium) solid var(--color-rule)",
-    overflow: "hidden",
+    background: "var(--color-border)",
   };
 
   const progressFillStyle: CSSProperties = {
+    position: "absolute",
+    top: 0,
+    left: 0,
     height: "100%",
     width: `${progress}%`,
-    background: "var(--color-fg)",
+    background: "var(--color-ink)",
     transition: "width 80ms linear",
-  };
-
-  const progressNumeralStyle: CSSProperties = {
-    fontFamily: "var(--font-display)",
-    fontSize: "var(--text-title)",
-    fontWeight: 900,
-    letterSpacing: "-0.02em",
-    color: "var(--color-fg)",
-    textAlign: "center",
-    marginTop: "var(--space-2)",
   };
 
   return (
@@ -121,34 +129,41 @@ export function ScanView() {
       masthead={{ kicker: "KANDONG · 看一下", issue: "DECODING", date: formatToday() }}
     >
       <section
+        aria-label="正在分析"
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "stretch",
-          paddingTop: "var(--space-3)",
+          gap: "var(--space-5)",
         }}
       >
-        <ScanSpinner accent="neutral" />
-        <p style={{ ...eyebrowStyle, marginTop: "var(--space-3)" }}>
-          ANALYZING · 正在看懂
-        </p>
-        <h1 style={stackHeadlineStyle}>
-          正
-          <br />
-          在
+        <span className="kd-section-eyebrow">Analyzing · 正在看懂</span>
+        <h1 style={headlineStyle}>
+          正在
           <br />
           看…
         </h1>
-        <hr
-          aria-hidden="true"
-          style={{
-            border: 0,
-            height: "var(--rule-heavy)",
-            background: "var(--color-rule)",
-            margin: "var(--space-3) 0 var(--space-2)",
-          }}
-        />
-        <p style={subStyle}>稍等几秒,我帮您看懂</p>
+        <p style={subStyle}>稍等几秒,<br />我帮您看懂这张图。</p>
+      </section>
+
+      <section
+        aria-hidden="true"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          paddingBlock: "var(--space-5)",
+        }}
+      >
+        <ScanSpinner accent="neutral" />
+      </section>
+
+      <section
+        aria-label="进度"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--space-3)",
+        }}
+      >
         <div
           role="progressbar"
           aria-valuemin={0}
@@ -159,12 +174,24 @@ export function ScanView() {
         >
           <div style={progressFillStyle} />
         </div>
-        <p style={progressNumeralStyle} aria-hidden="true">
-          {String(progress).padStart(3, "0")}%
+        <p style={percentStyle} aria-hidden="true">
+          {String(progress).padStart(2, "0")}
+          <span
+            style={{
+              fontSize: "0.32em",
+              letterSpacing: "0",
+              verticalAlign: "0.6em",
+              marginLeft: "0.05em",
+              color: "var(--color-muted)",
+            }}
+          >
+            %
+          </span>
         </p>
+        <span style={percentSubStyle}>Progress · 进度</span>
       </section>
 
-      <section style={{ marginTop: "var(--space-3)" }}>
+      <section style={{ marginTop: "var(--space-2)" }}>
         <AutoSpeech script={SCAN_VOICE_SCRIPT} />
       </section>
     </PageShell>

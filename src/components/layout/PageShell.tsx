@@ -8,10 +8,14 @@ interface MastheadConfig {
   date?: string;
   /** Kicker / publication name, e.g. "反诈助手". */
   kicker?: string;
+  /** Show the giant 看懂 wordmark as the masthead anchor. Defaults true. */
+  showWordmark?: boolean;
+  /** Optional tagline below the wordmark. */
+  tagline?: string;
 }
 
 interface PageShellProps {
-  /** Optional header title — renders as compact dateline header with back arrow. */
+  /** Optional header title — renders as compact header with back arrow. */
   title?: string;
   /** Where the back arrow points. Defaults to «/». */
   backHref?: string;
@@ -29,63 +33,51 @@ const shellStyle: CSSProperties = {
   maxWidth: "var(--max-width)",
   marginInline: "auto",
   paddingTop: "calc(env(safe-area-inset-top) + var(--space-3))",
-  paddingBottom: "calc(env(safe-area-inset-bottom) + var(--space-5))",
-  paddingLeft: "calc(env(safe-area-inset-left) + var(--space-3))",
-  paddingRight: "calc(env(safe-area-inset-right) + var(--space-3))",
+  paddingBottom: "calc(env(safe-area-inset-bottom) + var(--space-9))",
+  paddingLeft: "calc(env(safe-area-inset-left) + var(--space-5))",
+  paddingRight: "calc(env(safe-area-inset-right) + var(--space-5))",
   display: "flex",
   flexDirection: "column",
-  gap: "var(--space-4)",
+  gap: "var(--space-7)",
   minHeight: "100dvh",
+  position: "relative",
 };
 
 const backStyle: CSSProperties = {
-  minWidth: 88,
-  minHeight: 88,
+  minWidth: 64,
+  minHeight: 64,
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  borderRadius: "var(--radius-button)",
-  background: "var(--color-fg)",
-  color: "var(--color-bg)",
+  borderRadius: "var(--radius-full)",
+  background: "transparent",
+  border: "1.5px solid var(--color-ink)",
+  color: "var(--color-ink)",
   textDecoration: "none",
-  boxShadow: "var(--shadow-button)",
   flexShrink: 0,
 };
 
 const titleStyle: CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "var(--text-title)",
-  fontWeight: 900,
+  fontSize: "clamp(28px, 9vw, 40px)",
+  fontWeight: 400,
   letterSpacing: "-0.02em",
-  lineHeight: 1,
+  lineHeight: 1.05,
   margin: 0,
   flex: 1,
   minWidth: 0,
   wordBreak: "break-word",
-};
-
-const datelineStripStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "baseline",
-  justifyContent: "space-between",
-  fontSize: "var(--text-eyebrow)",
-  fontWeight: 800,
-  letterSpacing: "0.22em",
-  textTransform: "uppercase",
-  color: "var(--color-fg)",
-  paddingBottom: "var(--space-1)",
-  borderBottom: "var(--rule-hair) solid var(--color-rule)",
-  gap: "var(--space-2)",
+  color: "var(--color-ink)",
 };
 
 const BackArrow = (
   <svg
-    width="40"
-    height="40"
+    width="24"
+    height="24"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2.6"
+    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
@@ -105,25 +97,52 @@ export function PageShell({
 }: PageShellProps) {
   const hasHeader = Boolean(title);
   const hasMasthead = Boolean(masthead);
+  const showWordmark = masthead?.showWordmark ?? false;
   return (
     <div style={shellStyle}>
       {hasMasthead ? (
-        <div style={datelineStripStyle} aria-hidden="true">
-          <span>{masthead?.kicker ?? "KANDONG"}</span>
-          <span style={{ flex: 1, textAlign: "center", opacity: 0.7 }}>
-            {masthead?.issue ?? ""}
-          </span>
-          <span>{masthead?.date ?? ""}</span>
-        </div>
+        <header className="kd-masthead" aria-hidden="true">
+          <div className="kd-masthead-row">
+            <span>{masthead?.kicker ?? "KANDONG"}</span>
+            <span>{masthead?.issue ?? ""}</span>
+            <span style={{ textAlign: "right" }}>{masthead?.date ?? ""}</span>
+          </div>
+          {showWordmark ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "var(--space-2)",
+                marginTop: "var(--space-3)",
+              }}
+            >
+              <span className="kd-wordmark">看懂一下</span>
+              {masthead?.tagline ? (
+                <span
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    color: "var(--color-muted)",
+                  }}
+                >
+                  {masthead.tagline}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+        </header>
       ) : null}
       {hasHeader ? (
         <header
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "var(--space-3)",
-            paddingBottom: "var(--space-2)",
-            borderBottom: "var(--rule-heavy) solid var(--color-rule)",
+            gap: "var(--space-4)",
+            paddingBottom: "var(--space-3)",
+            borderBottom: "1px solid var(--color-border)",
           }}
         >
           {!hideBack ? (
@@ -143,7 +162,7 @@ export function PageShell({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--space-4)",
+          gap: "var(--space-7)",
           flex: 1,
         }}
       >
