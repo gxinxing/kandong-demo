@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 interface ScanSpinnerProps {
-  /** Optional level — colors the ring. Defaults to a neutral ink color. */
   accent?: "red" | "yellow" | "green" | "neutral";
 }
 
@@ -16,17 +15,14 @@ const ACCENT_COLOR: Record<NonNullable<ScanSpinnerProps["accent"]>, string> = {
 };
 
 /**
- * 240px circular progress ring used on /scan. CSS-only — a conic-gradient that
- * rotates via `@keyframes`. Honors prefers-reduced-motion: when the user has
- * opted out of motion we render a static ring with «看一下…» text instead.
+ * Editorial dot-grid scanner. A 4×4 grid of square ink blocks pulses in a
+ * type-setter rhythm. Static fallback on prefers-reduced-motion.
  */
 export function ScanSpinner({ accent = "neutral" }: ScanSpinnerProps) {
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) {
-      return;
-    }
+    if (typeof window === "undefined" || !window.matchMedia) return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
@@ -36,47 +32,51 @@ export function ScanSpinner({ accent = "neutral" }: ScanSpinnerProps) {
 
   const color = ACCENT_COLOR[accent];
 
-  const outerStyle: CSSProperties = {
+  const wrapStyle: CSSProperties = {
     width: 240,
     height: 240,
-    borderRadius: "50%",
-    position: "relative",
-    background: `conic-gradient(${color} 0deg, ${color} 270deg, transparent 270deg, transparent 360deg)`,
-    animation: reducedMotion
-      ? undefined
-      : "kd-spin 1.4s linear infinite",
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gridTemplateRows: "repeat(4, 1fr)",
+    gap: 12,
     margin: "0 auto",
-    boxShadow: "var(--shadow-card)",
+    padding: 16,
+    background: "var(--color-paper)",
+    border: "var(--rule-medium) solid var(--color-rule)",
+    boxShadow: "0 1px 0 var(--color-rule), 6px 6px 0 var(--color-rule)",
   };
 
-  const innerStyle: CSSProperties = {
-    position: "absolute",
-    inset: 16,
-    borderRadius: "50%",
-    background: "var(--color-bg)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "var(--text-button)",
-    fontWeight: 700,
-    color: "var(--color-fg)",
-    letterSpacing: "0.04em",
-  };
+  const blocks = Array.from({ length: 16 }, (_, i) => i);
 
   return (
     <div
       role="progressbar"
       aria-label="正在看懂截图,请稍等"
-      style={outerStyle}
+      style={wrapStyle}
     >
-      <span style={innerStyle}>看一下…</span>
+      {blocks.map((i) => {
+        const delay = ((i * 79) % 1400) / 1400;
+        return (
+          <span
+            key={i}
+            aria-hidden="true"
+            style={{
+              background: color,
+              animation: reducedMotion
+                ? undefined
+                : `kd-pulse 1.4s ${delay}s ease-in-out infinite`,
+              opacity: reducedMotion ? 1 : 0.2,
+            }}
+          />
+        );
+      })}
       <style>{`
-        @keyframes kd-spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes kd-pulse {
+          0%, 100% { opacity: 0.18; transform: scale(0.85); }
+          50% { opacity: 1; transform: scale(1); }
         }
         @media (prefers-reduced-motion: reduce) {
-          [role="progressbar"] { animation: none !important; }
+          [role="progressbar"] span { animation: none !important; opacity: 1 !important; transform: none !important; }
         }
       `}</style>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { PageShell } from "@/components/layout/PageShell";
@@ -10,10 +10,6 @@ import { HOME_VOICE_SCRIPT } from "@/components/voice/useVoiceScript";
 import { loadDemoData } from "@/lib/demo-data";
 import type { DemoCase, DemoCaseId } from "@/lib/demo-data";
 
-/**
- * Picks one of the three demo cases deterministically per page load.
- * Used for the «拍照» / «从相册选» entry buttons which are stubs in v1.
- */
 function pickDemoIdFromSource(): DemoCaseId {
   const ids: readonly DemoCaseId[] = ["demo-black", "demo-gray", "demo-white"];
   const idx = Math.floor(Math.random() * ids.length);
@@ -28,22 +24,30 @@ interface DemoOption {
 }
 
 const LEVEL_LABEL: Record<DemoCase["level"], string> = {
-  red: "红 · 高风险",
-  yellow: "黄 · 要警惕",
-  green: "绿 · 安全",
+  red: "红",
+  yellow: "黄",
+  green: "绿",
 };
 
-const LEVEL_ACCENT: Record<DemoCase["level"], string> = {
+const LEVEL_BG: Record<DemoCase["level"], string> = {
   red: "var(--color-red)",
   yellow: "var(--color-yellow)",
   green: "var(--color-green)",
 };
 
-const LEVEL_SOFT: Record<DemoCase["level"], string> = {
-  red: "var(--color-red-soft)",
-  yellow: "var(--color-yellow-soft)",
-  green: "var(--color-green-soft)",
+const LEVEL_TEXT: Record<DemoCase["level"], string> = {
+  red: "#fff5f0",
+  yellow: "#1a1000",
+  green: "#f0fff5",
 };
+
+function formatToday(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}·${m}·${day}`;
+}
 
 export function HomeView() {
   const router = useRouter();
@@ -65,9 +69,7 @@ export function HomeView() {
     let cancelled = false;
     loadDemoData()
       .then((data) => {
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
         setOptions(
           data.cases.map((c) => ({
             id: c.id,
@@ -87,9 +89,7 @@ export function HomeView() {
 
   const startStubbedScan = useCallback(
     (source: "camera" | "album") => {
-      if (navigating) {
-        return;
-      }
+      if (navigating) return;
       setNavigating(source);
       const demoId = pickDemoIdFromSource();
       navTimerRef.current = window.setTimeout(() => {
@@ -100,57 +100,174 @@ export function HomeView() {
     [navigating, router],
   );
 
-  const captionStyle: CSSProperties = {
-    fontSize: "var(--text-caption)",
-    color: "var(--color-muted)",
-    fontWeight: 700,
-    letterSpacing: "0.08em",
+  const today = useMemo(() => formatToday(), []);
+
+  const mastheadStyle: CSSProperties = {
+    fontFamily: "var(--font-display)",
+    fontSize: "var(--text-masthead)",
+    fontWeight: 900,
+    lineHeight: 0.82,
+    letterSpacing: "-0.04em",
+    color: "var(--color-fg)",
+    margin: 0,
   };
 
-  const heroStyle: CSSProperties = {
-    fontSize: "var(--text-hero)",
-    marginTop: "var(--space-2)",
+  const eyebrowStyle: CSSProperties = {
+    fontSize: "var(--text-eyebrow)",
+    fontWeight: 800,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: "var(--color-fg)",
   };
 
   const subheadStyle: CSSProperties = {
-    marginTop: "var(--space-3)",
-    fontSize: "var(--text-body)",
-    color: "var(--color-muted)",
+    fontFamily: "var(--font-display)",
+    fontSize: "var(--text-title)",
+    fontWeight: 700,
+    lineHeight: 1.15,
+    letterSpacing: "-0.01em",
+    color: "var(--color-fg)",
+    margin: 0,
+    textWrap: "balance",
   };
 
-  const pickerWrapStyle: CSSProperties = {
-    marginTop: "var(--space-3)",
-    background: "var(--color-surface)",
-    border: "2px solid var(--color-border)",
-    borderRadius: "var(--radius-card)",
+  // Hero "risk灯 sample" — shows what the result looks like at a glance.
+  const heroBlockStyle: CSSProperties = {
+    background: "var(--color-red)",
+    color: "#fff5f0",
     padding: "var(--space-3)",
-    boxShadow: "var(--shadow-card)",
+    display: "grid",
+    gridTemplateColumns: "auto 1fr",
+    gap: "var(--space-3)",
+    alignItems: "stretch",
+    boxShadow: "0 1px 0 var(--color-rule), 6px 6px 0 var(--color-rule)",
+    border: "var(--rule-medium) solid var(--color-rule)",
+  };
+
+  const heroGlyphStyle: CSSProperties = {
+    fontFamily: "var(--font-display)",
+    fontSize: "clamp(7rem, 5rem + 10vw, 11rem)",
+    fontWeight: 900,
+    lineHeight: 0.8,
+    letterSpacing: "-0.04em",
+    paddingRight: "var(--space-2)",
+    borderRight: "var(--rule-medium) solid #fff5f0",
+  };
+
+  const heroLabelStyle: CSSProperties = {
     display: "flex",
     flexDirection: "column",
+    justifyContent: "space-between",
+    paddingLeft: "var(--space-1)",
     gap: "var(--space-2)",
   };
 
   return (
-    <PageShell>
-      <section style={{ paddingTop: "var(--space-4)" }}>
-        <p style={captionStyle}>给爸妈的反诈助手</p>
-        <h1 style={heroStyle}>看懂一下</h1>
+    <PageShell
+      masthead={{ kicker: "KANDONG", issue: "反诈助手", date: today }}
+    >
+      {/* MASTHEAD */}
+      <section style={{ paddingTop: "var(--space-2)" }}>
+        <p style={eyebrowStyle}>给爸妈的反诈助手 · 第 001 期</p>
+        <h1 style={{ ...mastheadStyle, marginTop: "var(--space-2)" }}>
+          看
+          <br />
+          懂
+          <br />
+          一<br />
+          下
+        </h1>
+        <hr
+          aria-hidden="true"
+          style={{
+            border: 0,
+            height: "var(--rule-heavy)",
+            background: "var(--color-rule)",
+            margin: "var(--space-3) 0",
+          }}
+        />
         <p style={subheadStyle}>
-          上传截图,AI 用大字加语音告诉您「是不是骗子」。
+          上传一张<span style={{ background: "var(--color-yellow)", padding: "0 0.15em" }}>可疑截图</span>
+          ，AI 用大字加语音
+          告诉您「是不是骗子」。
         </p>
       </section>
 
+      {/* HERO RISK灯 SAMPLE */}
       <section
+        aria-label="风险灯示例"
+        style={{ marginTop: "var(--space-2)" }}
+      >
+        <p
+          style={{
+            ...eyebrowStyle,
+            marginBottom: "var(--space-2)",
+            color: "var(--color-muted)",
+          }}
+        >
+          看一眼就知道 · risk at a glance
+        </p>
+        <div style={heroBlockStyle}>
+          <div aria-hidden="true" style={heroGlyphStyle}>
+            红
+          </div>
+          <div style={heroLabelStyle}>
+            <span
+              style={{
+                fontSize: "var(--text-eyebrow)",
+                fontWeight: 800,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                opacity: 0.85,
+              }}
+            >
+              STOP · 高风险
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(2rem, 1.4rem + 2.6vw, 3rem)",
+                fontWeight: 900,
+                lineHeight: 0.95,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              钱进去就回不来
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA STACK */}
+      <section
+        aria-label="开始扫描"
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--space-3)",
+          gap: "var(--space-2)",
+          marginTop: "var(--space-2)",
         }}
       >
+        <p style={eyebrowStyle}>开始 · start here</p>
         <BigButton
           onClick={() => startStubbedScan("camera")}
           disabled={navigating !== null}
-          fullWidth
+          leading={
+            <span
+              aria-hidden="true"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--text-numeral)",
+                fontWeight: 900,
+                lineHeight: 0.8,
+                color: "var(--color-bg)",
+                opacity: 0.55,
+                minWidth: "1.2em",
+              }}
+            >
+              一
+            </span>
+          }
         >
           {navigating === "camera" ? "打开相机…" : "拍照看一下"}
         </BigButton>
@@ -158,7 +275,22 @@ export function HomeView() {
           variant="secondary"
           onClick={() => startStubbedScan("album")}
           disabled={navigating !== null}
-          fullWidth
+          leading={
+            <span
+              aria-hidden="true"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--text-numeral)",
+                fontWeight: 900,
+                lineHeight: 0.8,
+                color: "var(--color-fg)",
+                opacity: 0.4,
+                minWidth: "1.2em",
+              }}
+            >
+              二
+            </span>
+          }
         >
           {navigating === "album" ? "打开相册…" : "从相册选"}
         </BigButton>
@@ -168,7 +300,23 @@ export function HomeView() {
           disabled={navigating !== null}
           aria-expanded={pickerOpen}
           aria-controls="kd-demo-picker"
-          fullWidth
+          trailingArrow={false}
+          leading={
+            <span
+              aria-hidden="true"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--text-numeral)",
+                fontWeight: 900,
+                lineHeight: 0.8,
+                color: "var(--color-fg)",
+                opacity: 0.4,
+                minWidth: "1.2em",
+              }}
+            >
+              三
+            </span>
+          }
         >
           {pickerOpen ? "收起例子" : "先试一下"}
         </BigButton>
@@ -178,12 +326,24 @@ export function HomeView() {
         <section
           id="kd-demo-picker"
           aria-label="演示案例选择"
-          style={pickerWrapStyle}
+          style={{
+            marginTop: "var(--space-2)",
+            borderTop: "var(--rule-heavy) solid var(--color-rule)",
+            paddingTop: "var(--space-3)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-2)",
+          }}
         >
+          <p style={eyebrowStyle}>样张目录 · case archive</p>
           <h2
             style={{
+              fontFamily: "var(--font-display)",
               fontSize: "var(--text-title)",
-              fontWeight: 800,
+              fontWeight: 900,
+              letterSpacing: "-0.02em",
+              lineHeight: 1,
+              margin: 0,
               marginBottom: "var(--space-2)",
             }}
           >
@@ -205,7 +365,6 @@ export function HomeView() {
                 as="a"
                 href={`/scan?demo=${opt.id}`}
                 variant="secondary"
-                fullWidth
                 leading={
                   <span
                     aria-hidden="true"
@@ -213,15 +372,16 @@ export function HomeView() {
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      minWidth: 64,
-                      height: 48,
-                      padding: "0 16px",
-                      borderRadius: 999,
-                      background: LEVEL_SOFT[opt.level],
-                      color: LEVEL_ACCENT[opt.level],
-                      fontSize: "1.25rem",
-                      fontWeight: 800,
-                      letterSpacing: "0.04em",
+                      minWidth: 56,
+                      height: 56,
+                      padding: "0 var(--space-2)",
+                      background: LEVEL_BG[opt.level],
+                      color: LEVEL_TEXT[opt.level],
+                      fontFamily: "var(--font-display)",
+                      fontSize: "var(--text-button)",
+                      fontWeight: 900,
+                      letterSpacing: "-0.02em",
+                      border: "var(--rule-medium) solid var(--color-rule)",
                     }}
                   >
                     {LEVEL_LABEL[opt.level]}

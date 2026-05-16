@@ -8,8 +8,15 @@ import { CARD_VOICE_SCRIPT } from "@/components/voice/useVoiceScript";
 import { getCase } from "@/lib/demo-data";
 
 interface CardPageProps {
-  // Next.js 16: dynamic route `params` is a Promise and must be awaited.
   params: Promise<{ id: string }>;
+}
+
+function formatToday(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}·${m}·${day}`;
 }
 
 export default async function CardPage({ params }: CardPageProps) {
@@ -19,11 +26,20 @@ export default async function CardPage({ params }: CardPageProps) {
     notFound();
   }
 
+  const eyebrowStyle: CSSProperties = {
+    fontSize: "var(--text-eyebrow)",
+    fontWeight: 800,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: "var(--color-muted)",
+  };
+
   const tipStyle: CSSProperties = {
     fontSize: "var(--text-body)",
     color: "var(--color-fg)",
-    background: "var(--color-surface)",
-    borderRadius: "var(--radius-card)",
+    background: "var(--color-paper)",
+    border: "var(--rule-medium) solid var(--color-rule)",
+    borderLeft: "12px solid var(--color-fg)",
     padding: "var(--space-3)",
     boxShadow: "var(--shadow-card)",
     lineHeight: 1.5,
@@ -32,15 +48,25 @@ export default async function CardPage({ params }: CardPageProps) {
 
   const tipLabelStyle: CSSProperties = {
     display: "block",
-    fontSize: "var(--text-caption)",
+    fontSize: "var(--text-eyebrow)",
     fontWeight: 800,
-    letterSpacing: "0.08em",
-    color: "var(--color-muted)",
-    marginBottom: "var(--space-1)",
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: "var(--color-fg)",
+    marginBottom: "var(--space-2)",
   };
 
   return (
-    <PageShell title="告诉家人" backHref={`/result/${caseData.id}`} backLabel="返回结果">
+    <PageShell
+      masthead={{ kicker: "KANDONG · 发布卡片", issue: "BROADSIDE", date: formatToday() }}
+      title="告诉家人"
+      backHref={`/result/${caseData.id}`}
+      backLabel="返回结果"
+    >
+      <section>
+        <p style={eyebrowStyle}>告诉家人 · share with family</p>
+      </section>
+
       <section aria-label="给家人的提醒卡片">
         <FamilyCard caseData={caseData} />
       </section>
@@ -55,14 +81,13 @@ export default async function CardPage({ params }: CardPageProps) {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--space-3)",
-          marginTop: "var(--space-2)",
+          gap: "var(--space-2)",
         }}
       >
-        <BigButton as="a" href={`/result/${caseData.id}`} variant="secondary" fullWidth>
+        <BigButton as="a" href={`/result/${caseData.id}`} variant="secondary">
           回到结果页
         </BigButton>
-        <BigButton as="a" href="/" variant="ghost" fullWidth>
+        <BigButton as="a" href="/" variant="ghost" trailingArrow={false}>
           回到首页
         </BigButton>
       </section>

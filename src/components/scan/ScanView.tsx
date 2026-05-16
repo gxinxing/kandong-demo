@@ -19,39 +19,32 @@ function isDemoCaseId(value: string | null): value is DemoCaseId {
   return value !== null && (VALID_IDS as readonly string[]).includes(value);
 }
 
-/**
- * Deterministic fallback if the URL didn't carry a ?demo=... param. We map by
- * minute of day so the demo cycles across the three risk levels during a live
- * presentation rather than always rendering the same case.
- */
 function fallbackDemoId(): DemoCaseId {
   const idx = Math.floor(Date.now() / 60000) % VALID_IDS.length;
   return VALID_IDS[idx];
 }
 
-/**
- * Client view for /scan. Must live in its own component because it calls
- * `useSearchParams()`, which Next 16 requires to be inside a <Suspense>
- * boundary so the rest of the route can prerender as static HTML.
- */
+function formatToday(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}·${m}·${day}`;
+}
+
 export function ScanView() {
   const router = useRouter();
   const params = useSearchParams();
   const [progress, setProgress] = useState(0);
   const navigatedRef = useRef(false);
 
-  // Resolve demo id once on mount. PRD §13 — the spinner stays for 2.5s,
-  // long enough to feel like an analysis, short enough that elderly users
-  // don't think the app is stuck.
   const demoId = useMemo<DemoCaseId>(() => {
     const raw = params.get("demo");
     return isDemoCaseId(raw) ? raw : fallbackDemoId();
   }, [params]);
 
   useEffect(() => {
-    if (navigatedRef.current) {
-      return;
-    }
+    if (navigatedRef.current) return;
     const startedAt = Date.now();
     const totalMs = 2500;
     const tick = window.setInterval(() => {
@@ -68,10 +61,25 @@ export function ScanView() {
     };
   }, [demoId, router]);
 
-  const heroStyle: CSSProperties = {
-    fontSize: "var(--text-hero)",
+  const eyebrowStyle: CSSProperties = {
+    fontSize: "var(--text-eyebrow)",
+    fontWeight: 800,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: "var(--color-muted)",
     textAlign: "center",
-    marginTop: "var(--space-4)",
+  };
+
+  const stackHeadlineStyle: CSSProperties = {
+    fontFamily: "var(--font-display)",
+    fontSize: "var(--text-hero)",
+    fontWeight: 900,
+    lineHeight: 0.9,
+    letterSpacing: "-0.03em",
+    color: "var(--color-fg)",
+    textAlign: "center",
+    margin: 0,
+    marginTop: "var(--space-3)",
   };
 
   const subStyle: CSSProperties = {
@@ -79,16 +87,16 @@ export function ScanView() {
     color: "var(--color-muted)",
     textAlign: "center",
     marginTop: "var(--space-2)",
+    fontWeight: 600,
   };
 
   const progressTrackStyle: CSSProperties = {
     marginTop: "var(--space-4)",
-    height: 16,
+    height: 18,
     width: "100%",
-    background: "var(--color-surface)",
-    borderRadius: 999,
+    background: "var(--color-paper)",
+    border: "var(--rule-medium) solid var(--color-rule)",
     overflow: "hidden",
-    boxShadow: "inset 0 0 0 2px var(--color-border)",
   };
 
   const progressFillStyle: CSSProperties = {
@@ -98,18 +106,48 @@ export function ScanView() {
     transition: "width 80ms linear",
   };
 
+  const progressNumeralStyle: CSSProperties = {
+    fontFamily: "var(--font-display)",
+    fontSize: "var(--text-title)",
+    fontWeight: 900,
+    letterSpacing: "-0.02em",
+    color: "var(--color-fg)",
+    textAlign: "center",
+    marginTop: "var(--space-2)",
+  };
+
   return (
-    <PageShell>
+    <PageShell
+      masthead={{ kicker: "KANDONG · 看一下", issue: "DECODING", date: formatToday() }}
+    >
       <section
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          paddingTop: "var(--space-5)",
+          alignItems: "stretch",
+          paddingTop: "var(--space-3)",
         }}
       >
         <ScanSpinner accent="neutral" />
-        <h1 style={heroStyle}>正在看…</h1>
+        <p style={{ ...eyebrowStyle, marginTop: "var(--space-3)" }}>
+          ANALYZING · 正在看懂
+        </p>
+        <h1 style={stackHeadlineStyle}>
+          正
+          <br />
+          在
+          <br />
+          看…
+        </h1>
+        <hr
+          aria-hidden="true"
+          style={{
+            border: 0,
+            height: "var(--rule-heavy)",
+            background: "var(--color-rule)",
+            margin: "var(--space-3) 0 var(--space-2)",
+          }}
+        />
         <p style={subStyle}>稍等几秒,我帮您看懂</p>
         <div
           role="progressbar"
@@ -121,6 +159,9 @@ export function ScanView() {
         >
           <div style={progressFillStyle} />
         </div>
+        <p style={progressNumeralStyle} aria-hidden="true">
+          {String(progress).padStart(3, "0")}%
+        </p>
       </section>
 
       <section style={{ marginTop: "var(--space-3)" }}>

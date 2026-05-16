@@ -1,8 +1,17 @@
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 
+interface MastheadConfig {
+  /** Issue numeral, e.g. "No.001". */
+  issue?: string;
+  /** Dateline, e.g. "2026·05·16". */
+  date?: string;
+  /** Kicker / publication name, e.g. "反诈助手". */
+  kicker?: string;
+}
+
 interface PageShellProps {
-  /** Optional header title. When provided a back-arrow is rendered. */
+  /** Optional header title — renders as compact dateline header with back arrow. */
   title?: string;
   /** Where the back arrow points. Defaults to «/». */
   backHref?: string;
@@ -10,6 +19,8 @@ interface PageShellProps {
   hideBack?: boolean;
   /** Override the back button accessible label. */
   backLabel?: string;
+  /** Optional masthead config — renders editorial dateline strip across top. */
+  masthead?: MastheadConfig;
   children: ReactNode;
 }
 
@@ -18,7 +29,7 @@ const shellStyle: CSSProperties = {
   maxWidth: "var(--max-width)",
   marginInline: "auto",
   paddingTop: "calc(env(safe-area-inset-top) + var(--space-3))",
-  paddingBottom: "calc(env(safe-area-inset-bottom) + var(--space-4))",
+  paddingBottom: "calc(env(safe-area-inset-bottom) + var(--space-5))",
   paddingLeft: "calc(env(safe-area-inset-left) + var(--space-3))",
   paddingRight: "calc(env(safe-area-inset-right) + var(--space-3))",
   display: "flex",
@@ -33,22 +44,38 @@ const backStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  borderRadius: "var(--radius-pill)",
-  background: "var(--color-surface)",
-  color: "var(--color-fg)",
+  borderRadius: "var(--radius-button)",
+  background: "var(--color-fg)",
+  color: "var(--color-bg)",
   textDecoration: "none",
   boxShadow: "var(--shadow-button)",
   flexShrink: 0,
 };
 
 const titleStyle: CSSProperties = {
+  fontFamily: "var(--font-display)",
   fontSize: "var(--text-title)",
-  fontWeight: 800,
-  letterSpacing: "-0.01em",
+  fontWeight: 900,
+  letterSpacing: "-0.02em",
+  lineHeight: 1,
   margin: 0,
   flex: 1,
   minWidth: 0,
   wordBreak: "break-word",
+};
+
+const datelineStripStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "baseline",
+  justifyContent: "space-between",
+  fontSize: "var(--text-eyebrow)",
+  fontWeight: 800,
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  color: "var(--color-fg)",
+  paddingBottom: "var(--space-1)",
+  borderBottom: "var(--rule-hair) solid var(--color-rule)",
+  gap: "var(--space-2)",
 };
 
 const BackArrow = (
@@ -73,17 +100,30 @@ export function PageShell({
   backHref = "/",
   hideBack,
   backLabel,
+  masthead,
   children,
 }: PageShellProps) {
   const hasHeader = Boolean(title);
+  const hasMasthead = Boolean(masthead);
   return (
     <div style={shellStyle}>
+      {hasMasthead ? (
+        <div style={datelineStripStyle} aria-hidden="true">
+          <span>{masthead?.kicker ?? "KANDONG"}</span>
+          <span style={{ flex: 1, textAlign: "center", opacity: 0.7 }}>
+            {masthead?.issue ?? ""}
+          </span>
+          <span>{masthead?.date ?? ""}</span>
+        </div>
+      ) : null}
       {hasHeader ? (
         <header
           style={{
             display: "flex",
             alignItems: "center",
             gap: "var(--space-3)",
+            paddingBottom: "var(--space-2)",
+            borderBottom: "var(--rule-heavy) solid var(--color-rule)",
           }}
         >
           {!hideBack ? (
