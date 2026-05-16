@@ -1,11 +1,10 @@
 /**
  * Offline-first demo data loader for 看懂一下.
  *
- * Single source of truth: `/public/demo-data.json`. Both server and client
- * components can call `loadDemoData()` — on the server we use the absolute
- * URL via `headers()` is not needed because Next.js resolves /demo-data.json
- * from the same origin during fetch. We use `force-cache` so the offline
- * demo never hits the network during the live presentation.
+ * Single source of truth: `/public/demo-data.json`. Server components read
+ * it directly from the filesystem (Node.js `fetch` cannot resolve relative
+ * URLs); client components fetch over HTTP with `force-cache` so the
+ * offline断网 demo never hits the network during the live presentation.
  */
 
 export type DemoLevel = 'red' | 'yellow' | 'green';
@@ -32,17 +31,35 @@ export interface DemoData {
 
 const DEMO_DATA_URL = '/demo-data.json';
 
+let cached: DemoData | null = null;
+
+const isServer = typeof window === 'undefined';
+
 /**
- * Loads the three demo cases. Uses `force-cache` so the file is fetched
- * once and reused, which is what the offline断网 demo depends on.
+ * Loads the three demo cases. On the server we read the JSON straight off
+ * disk to avoid Node `fetch` rejecting relative URLs; on the client we use
+ * `force-cache` so the file is fetched once and reused.
  */
 export async function loadDemoData(): Promise<DemoData> {
+  if (cached) {
+    return cached;
+  }
+
+  if (isServer) {
+    const { readFile } = await import('node:fs/promises');
+    const path = await import('node:path');
+    const filePath = path.join(process.cwd(), 'public', 'demo-data.json');
+    const raw = await readFile(filePath, 'utf8');
+    cached = JSON.parse(raw) as DemoData;
+    return cached;
+  }
+
   const res = await fetch(DEMO_DATA_URL, { cache: 'force-cache' });
   if (!res.ok) {
     throw new Error(`Failed to load demo data: HTTP ${res.status}`);
   }
-  const data = (await res.json()) as DemoData;
-  return data;
+  cached = (await res.json()) as DemoData;
+  return cached;
 }
 
 /**
