@@ -120,7 +120,6 @@
 
 ## 16. 部署
 
-- 私仓：https://github.com/gxinxing/kandong-demo
 - 线上：https://kandong.ai.syt.huickathon.cn/
-- 服务器：149.88.72.246 (Debian 12 + nginx + systemd)
-- 部署脚本：`scripts/deploy.sh`
+- 服务器：Debian 12 + nginx + systemd（地址由 `.env.deploy` 注入）
+- 部署脚本：`scripts/deploy.sh`（参考 `.env.deploy.example`）
