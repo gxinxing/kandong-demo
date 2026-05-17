@@ -1,6 +1,19 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-ui",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "看懂一下 · 给爸妈的反诈助手",
@@ -22,7 +35,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover",
-  themeColor: "#fafafa",
+  themeColor: "#ffffff",
   colorScheme: "light",
 };
 
@@ -32,7 +45,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" className={`${playfair.variable} ${inter.variable}`}>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only">
           跳到主内容

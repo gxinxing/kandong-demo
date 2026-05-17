@@ -9,6 +9,10 @@ interface AutoSpeechProps {
   /** Label for the manual replay button. */
   replayLabel?: string;
   className?: string;
+  /** Headless mode — auto-speak on mount but render no visible replay button.
+   * Use when the surrounding UI already exposes a replay affordance (e.g. a
+   * Bubble with inline `speak`). */
+  silent?: boolean;
 }
 
 /**
@@ -25,6 +29,7 @@ export function AutoSpeech({
   script,
   replayLabel = "再听一遍",
   className,
+  silent = false,
 }: AutoSpeechProps) {
   const hasSpokenRef = useRef(false);
 
@@ -65,7 +70,9 @@ export function AutoSpeech({
     };
   }, [script]);
 
-  return <SpeechButton text={script} label={replayLabel} className={className} />;
+  return silent ? null : (
+    <SpeechButton text={script} label={replayLabel} className={className} />
+  );
 }
 
 export default AutoSpeech;

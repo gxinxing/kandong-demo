@@ -5,17 +5,25 @@ import type {
   ReactNode,
 } from "react";
 
-export type BigButtonVariant = "primary" | "secondary" | "ghost";
+export type BigButtonVariant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "danger";
 
 interface BaseProps {
   children: ReactNode;
   variant?: BigButtonVariant;
   className?: string;
   fullWidth?: boolean;
-  /** Optional emoji or icon node rendered before the label. */
+  /** Optional leading icon/emoji shown before the label. */
   leading?: ReactNode;
-  /** Show a hanging arrow affordance on the right. Defaults to true for primary/secondary. */
+  /** Optional trailing affordance (icon or text). Defaults to none. */
+  trailing?: ReactNode;
+  /** @deprecated Removed in v3.0 — accepted for backward compat, ignored. */
   trailingArrow?: boolean;
+  /** Bump size: "md" default 88, "lg" 104, "xl" 132 (round CTA). */
+  size?: "md" | "lg" | "xl";
 }
 
 type ButtonAsButton = BaseProps &
@@ -34,74 +42,67 @@ export type BigButtonProps = ButtonAsButton | ButtonAsAnchor;
 
 const VARIANT_STYLE: Record<BigButtonVariant, CSSProperties> = {
   primary: {
-    background: "var(--color-amethyst)",
-    color: "var(--color-amethyst-ink)",
-    boxShadow: "none",
+    background: "var(--color-ink)",
+    color: "var(--color-surface)",
     border: "1.5px solid var(--color-ink)",
+    boxShadow: "var(--shadow-cta)",
   },
   secondary: {
-    background: "transparent",
+    background: "var(--color-bubble)",
     color: "var(--color-ink)",
-    boxShadow: "none",
     border: "1.5px solid var(--color-ink)",
+    boxShadow: "var(--shadow-bubble)",
   },
   ghost: {
     background: "transparent",
     color: "var(--color-ink)",
-    border: "1px dashed var(--color-detail)",
+    border: "1.5px solid var(--color-line-strong)",
     boxShadow: "none",
   },
+  danger: {
+    background: "var(--color-risk-red)",
+    color: "var(--color-surface)",
+    border: "1.5px solid var(--color-risk-red)",
+    boxShadow: "var(--shadow-cta)",
+  },
+};
+
+const SIZE_MIN: Record<NonNullable<BaseProps["size"]>, number> = {
+  md: 88,
+  lg: 104,
+  xl: 132,
 };
 
 const baseClass = [
   "kd-bigbutton",
   "inline-flex",
   "items-center",
+  "justify-center",
   "gap-3",
   "select-none",
   "cursor-pointer",
-  "transition-all",
-  "duration-[var(--duration-fast)]",
-  "ease-[cubic-bezier(0.16,1,0.3,1)]",
   "active:scale-[0.98]",
-  "hover:shadow-[0_12px_28px_rgba(0,0,0,0.06)]",
   "disabled:opacity-50",
   "disabled:cursor-not-allowed",
   "disabled:active:scale-100",
 ].join(" ");
 
-const inlineSizing: CSSProperties = {
-  minHeight: 88,
-  minWidth: 88,
-  padding: "var(--space-4) var(--space-6)",
-  fontSize: "var(--text-button)",
-  fontFamily: "var(--font-sans)",
-  fontWeight: 600,
-  lineHeight: 1.2,
-  letterSpacing: "0",
-  textDecoration: "none",
-  borderRadius: "var(--radius-lg)",
-  width: "100%",
-  justifyContent: "space-between",
-  textAlign: "left",
-};
-
-const Arrow = (
-  <svg
-    width="28"
-    height="28"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <line x1="4" y1="12" x2="20" y2="12" />
-    <polyline points="14 6 20 12 14 18" />
-  </svg>
-);
+function sizingStyle(size: NonNullable<BaseProps["size"]>): CSSProperties {
+  const min = SIZE_MIN[size];
+  return {
+    minHeight: min,
+    minWidth: min,
+    padding: "var(--space-4) var(--space-3)",
+    fontSize: "var(--text-button)",
+    fontFamily: "var(--font-sans)",
+    fontWeight: 700,
+    lineHeight: 1.2,
+    letterSpacing: 0,
+    textDecoration: "none",
+    borderRadius: "var(--radius-button)",
+    transition: "transform var(--motion-fast) var(--ease-out)",
+  };
+}
 
 export function BigButton(props: BigButtonProps) {
   const {
@@ -110,14 +111,12 @@ export function BigButton(props: BigButtonProps) {
     className,
     fullWidth = true,
     leading,
-    trailingArrow,
+    trailing,
+    size = "md",
   } = props;
 
-  const showArrow =
-    trailingArrow ?? (variant === "primary" || variant === "secondary");
-
   const composedStyle: CSSProperties = {
-    ...inlineSizing,
+    ...sizingStyle(size),
     ...VARIANT_STYLE[variant],
     width: fullWidth ? "100%" : undefined,
   };
@@ -126,37 +125,35 @@ export function BigButton(props: BigButtonProps) {
 
   const content = (
     <>
-      <span
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "var(--space-3)",
-          flex: 1,
-          minWidth: 0,
-        }}
-      >
-        {leading != null ? (
-          <span aria-hidden="true" className="inline-flex items-center">
-            {leading}
-          </span>
-        ) : null}
-        <span style={{ flex: 1, minWidth: 0 }}>{children}</span>
+      {leading != null ? (
+        <span aria-hidden="true" className="inline-flex items-center">
+          {leading}
+        </span>
+      ) : null}
+      <span style={{ flex: fullWidth ? 1 : undefined, textAlign: "center" }}>
+        {children}
       </span>
-      {showArrow ? (
-        <span
-          aria-hidden="true"
-          className="inline-flex items-center"
-          style={{ flexShrink: 0, opacity: 0.9 }}
-        >
-          {Arrow}
+      {trailing != null ? (
+        <span aria-hidden="true" className="inline-flex items-center">
+          {trailing}
         </span>
       ) : null}
     </>
   );
 
   if (props.as === "a") {
-    const { as: _as, variant: _v, className: _c, fullWidth: _fw, leading: _l, trailingArrow: _ta, children: _ch, ...rest } =
-      props;
+    const {
+      as: _as,
+      variant: _v,
+      className: _c,
+      fullWidth: _fw,
+      leading: _l,
+      trailing: _t,
+      trailingArrow: _ta,
+      size: _s,
+      children: _ch,
+      ...rest
+    } = props;
     return (
       <a {...rest} className={composedClass} style={composedStyle}>
         {content}
@@ -164,8 +161,19 @@ export function BigButton(props: BigButtonProps) {
     );
   }
 
-  const { as: _as, variant: _v, className: _c, fullWidth: _fw, leading: _l, trailingArrow: _ta, children: _ch, type, ...rest } =
-    props;
+  const {
+    as: _as,
+    variant: _v,
+    className: _c,
+    fullWidth: _fw,
+    leading: _l,
+    trailing: _t,
+    trailingArrow: _ta,
+    size: _s,
+    children: _ch,
+    type,
+    ...rest
+  } = props;
   return (
     <button
       {...rest}

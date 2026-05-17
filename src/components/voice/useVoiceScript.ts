@@ -64,3 +64,10 @@ export const ERROR_VOICE_SCRIPT =
 
 export const NOT_FOUND_VOICE_SCRIPT =
   "没找到这一页,可能是链接旧了。您点下面的大按钮,我带您回到首页。";
+
+export const CHAPERONE_VOICE_SCRIPT =
+  "别慌,我先陪着您。这种事我们碰到过很多次,96110 是反诈专线,工作人员会一步步教您。点屏幕上那个大红色的「拨打 96110」就行。";
+
+export function SCENE_VOICE_SCRIPT(label: string): string {
+  return `好,我看到您选了「${label}」。请拍一张清楚的照片,把字朝上、灯光别太暗,我会用大字告诉您这是什么、要注意什么。`;
+}

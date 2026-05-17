@@ -1,170 +1,132 @@
-/* Fontshare Switzer + Google Fraunces (PP Editorial New stand-in) */
-@import url("https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&display=swap");
 @import "tailwindcss";
 
 /* ===========================================================================
-   看懂一下 (Kandong) — Mobile · Soft Editorial · Cloud Canvas + Porcelain
-   Design tokens: cloud-canvas bg, porcelain surface, graphite/ink text,
-   platinum/silver borders, deep-plum muted, amethyst/sky-blue decorative
-   accents. PP Editorial New display (Fraunces fallback), Switzer body.
-   Semantic risk red/yellow/green retained for安全信号.
-   适老化: AAA contrast on text, 88px touch targets, prefers-reduced-motion.
+   看懂一下 (Kandong) v3.0 — 帮帮气泡 App for Elderly
+   Visual soul: 米黄 #FFF8E7 bubble + 帮帮 mascot + Be My AI dialogue stream.
+   适老化: AAA contrast, 88px touch targets, 22pt body, prefers-reduced-motion.
    =========================================================================== */
 
 :root {
-  /* Surfaces — warm cream base, porcelain cards */
-  --color-canvas: #f5f2f0;       /* cloud-canvas page bg */
-  --color-surface: #ffffff;      /* porcelain card */
-  --color-bg: var(--color-canvas);
-  --color-paper: var(--color-surface);
+  /* Surfaces */
+  --color-canvas: #F5EFE0;
+  --color-canvas-deep: #EDE4CE;
+  --color-surface: #FFFDF7;
+  --color-bubble: #FFF6DC;
+  --color-bubble-2: #FFE9B0;
+  --color-bubble-tint: #FFFCEF;
+  --color-card: #FFFBEC;
 
-  /* Text — graphite body, ink display */
-  --color-fg: #333333;           /* graphite-text */
-  --color-ink: #000000;          /* ink-text headlines */
-  --color-fg-soft: #333333;
-  --color-muted: #7b7b7b;        /* deep-plum tertiary */
+  /* Text */
+  --color-ink: #2A1F12;
+  --color-ink-soft: #5A4632;
+  --color-ink-muted: #8A7860;
 
-  /* Borders + detail */
-  --color-border: #d6d6d6;       /* platinum */
-  --color-detail: #bcbcbc;       /* silver */
-  --color-rule: #d6d6d6;
-  --color-rule-strong: #333333;
+  /* Lines — warm brown not black */
+  --color-line: #E0D4B8;
+  --color-line-strong: #B89968;
+  --color-stroke: #6B4F2A;
 
-  /* Decorative brand accents */
-  --color-amethyst: #f1ccff;     /* primary action / brand */
-  --color-amethyst-ink: #4a1166; /* readable on amethyst */
-  --color-sky: #91e0ff;          /* secondary accent */
-  --color-sky-ink: #0a4a66;
+  /* Brand + risk */
+  --color-brand: #1F8A3C;
+  --color-brand-ink: #0E4A1C;
+  --color-risk-red: #D40000;
+  --color-risk-red-soft: #FCE6E6;
+  --color-risk-yellow: #E89000;
+  --color-risk-yellow-soft: #FDF2DD;
+  --color-risk-green: #1F8A3C;
+  --color-risk-green-soft: #DDF1E2;
 
-  /* Semantic risk — kept high-contrast for safety signal */
-  --color-red: #c0162a;
-  --color-red-soft: #fde7ea;
-  --color-red-ink: #6a0a16;
-  --color-yellow: #e0a800;
-  --color-yellow-soft: #fbf0c4;
-  --color-yellow-ink: #5a3d00;
-  --color-green: #1e6a32;
-  --color-green-soft: #d8eedd;
-  --color-green-ink: #0a3014;
+  --color-focus: #1F8A3C;
 
-  /* Focus ring — amethyst-on-ink for AA visibility */
-  --color-focus: #f1ccff;
+  /* Type scale — app-appropriate */
+  --text-caption: 18px;
+  --text-body: 22px;
+  --text-button: 24px;
+  --text-emphasis: 28px;
+  --text-title: 28px;
+  --text-headline: 36px;
+  --text-strong: 32px;
 
-  /* Type scale — mapped from token JSON, mobile-tuned */
-  --text-sm: 13px;
-  --text-sm-2: 14px;
-  --text-base: 16px;
-  --text-xl: 20px;
-  --text-3xl: 32px;
-  --text-5xl: 48px;
-  --text-5xl-3: 62px;
-
-  /* Aliases for editorial language */
-  --text-eyebrow: var(--text-sm);            /* 13px caps */
-  --text-caption: var(--text-sm-2);          /* 14px helper */
-  --text-body: var(--text-base);             /* 16px running */
-  --text-body-lg: 18px;
-  --text-button: var(--text-xl);             /* 20px CTA */
-  --text-title: var(--text-3xl);             /* 32px sub-heads */
-  --text-hero: var(--text-5xl);              /* 48px verdict */
-  --text-masthead: var(--text-5xl-3);        /* 62px display */
-  --text-numeral: 56px;                      /* hanging 一二三 */
-
-  /* Spacing — from token JSON, 4px unit */
-  --space-unit: 4px;
+  /* Spacing */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-7: 32px;
-  --space-8: 40px;
-  --space-9: 56px;
-  --space-10: 60px;
-  --space-11: 80px;
-  --space-12: 88px;
-  --space-13: 116px;
-  --space-14: 160px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
 
-  /* Radii — soft, generous */
-  --radius-sm: 10px;
-  --radius-md: 13px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
-  --radius-3xl: 32px;
-  --radius-3xl-2: 42px;
-  --radius-full: 48px;
+  /* Radii */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-button: 20px;
+  --radius-bubble: 24px;
+  --radius-lg: 28px;
   --radius-pill: 999px;
 
-  /* Shadows — feather-light, no hard print offsets */
-  --shadow-subtle: 0 1px 2px rgba(16, 24, 40, 0.05);
-  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.05),
-                 0 8px 24px rgba(0, 0, 0, 0.04);
-  --shadow-focus: 0 0 0 4px var(--color-amethyst),
-                  0 0 0 6px var(--color-ink);
+  /* Touch */
+  --touch-min: 88px;
+  --touch-cta: 132px;
 
-  /* Rules */
-  --rule-hair: 1px;
-  --rule-medium: 1px;
+  /* Shadows — warm card depth */
+  --shadow-bubble: 0 1px 0 rgba(42, 31, 18, 0.04),
+                   0 4px 12px rgba(110, 80, 40, 0.08);
+  --shadow-cta: 0 2px 0 rgba(42, 31, 18, 0.06),
+                0 8px 24px rgba(110, 80, 40, 0.16);
+  --shadow-card: 0 1px 0 rgba(42, 31, 18, 0.04),
+                 0 6px 18px rgba(110, 80, 40, 0.08),
+                 inset 0 0 0 1px rgba(184, 153, 104, 0.18);
+  --shadow-deep: 0 4px 0 rgba(42, 31, 18, 0.08),
+                 0 16px 40px rgba(110, 80, 40, 0.18);
 
   /* Motion */
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
+  --motion-fast: 180ms;
+  --motion-base: 240ms;
+  --motion-slow: 360ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Layout — phone-first */
+  /* Layout */
   --max-width: 480px;
+  --app-header-height: 64px;
+  --hold-bar-height: 96px;
 
-  /* Font stacks */
-  --font-display: "Fraunces", "PP Editorial New", "Times New Roman",
-                  "Songti SC", "STSong", "Source Han Serif SC",
-                  "Noto Serif CJK SC", serif;
-  --font-sans: "Switzer", -apple-system, BlinkMacSystemFont, "PingFang SC",
-               "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
-               system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  /* Font stack — system Chinese, no remote fonts */
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+               "Noto Sans CJK SC", system-ui, -apple-system,
+               BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "SF Mono", Menlo, Consolas, monospace;
 }
 
 @theme inline {
   --color-canvas: var(--color-canvas);
   --color-surface: var(--color-surface);
-  --color-bg: var(--color-bg);
-  --color-paper: var(--color-paper);
-  --color-fg: var(--color-fg);
+  --color-bubble: var(--color-bubble);
+  --color-bubble-2: var(--color-bubble-2);
   --color-ink: var(--color-ink);
-  --color-muted: var(--color-muted);
-  --color-border: var(--color-border);
-  --color-detail: var(--color-detail);
-  --color-amethyst: var(--color-amethyst);
-  --color-sky: var(--color-sky);
-  --color-red: var(--color-red);
-  --color-red-soft: var(--color-red-soft);
-  --color-yellow: var(--color-yellow);
-  --color-yellow-soft: var(--color-yellow-soft);
-  --color-green: var(--color-green);
-  --color-green-soft: var(--color-green-soft);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-line: var(--color-line);
+  --color-brand: var(--color-brand);
+  --color-risk-red: var(--color-risk-red);
+  --color-risk-yellow: var(--color-risk-yellow);
+  --color-risk-green: var(--color-risk-green);
   --color-focus: var(--color-focus);
 
   --font-sans: var(--font-sans);
-  --font-serif: var(--font-display);
 
-  --text-sm: var(--text-sm);
-  --text-base: var(--text-base);
-  --text-xl: var(--text-xl);
-  --text-3xl: var(--text-3xl);
-  --text-5xl: var(--text-5xl);
+  --text-caption: var(--text-caption);
+  --text-body: var(--text-body);
+  --text-button: var(--text-button);
+  --text-emphasis: var(--text-emphasis);
+  --text-title: var(--text-title);
+  --text-headline: var(--text-headline);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
+  --radius-button: var(--radius-button);
+  --radius-bubble: var(--radius-bubble);
   --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-2xl: var(--radius-2xl);
-  --radius-3xl: var(--radius-3xl);
-  --radius-full: var(--radius-full);
+  --radius-pill: var(--radius-pill);
 }
 
 /* ---------- Base ---------- */
@@ -184,32 +146,20 @@ body {
   margin: 0;
   min-height: 100dvh;
   background-color: var(--color-canvas);
-  /* Paper atmosphere — subtle warm wash + faint grain via layered gradients.
-     Stays light enough to preserve AAA contrast on body copy. */
   background-image:
-    radial-gradient(
-      120% 60% at 50% 0%,
-      rgba(241, 204, 255, 0.18) 0%,
-      rgba(241, 204, 255, 0) 60%
-    ),
-    radial-gradient(
-      90% 50% at 100% 100%,
-      rgba(145, 224, 255, 0.14) 0%,
-      rgba(145, 224, 255, 0) 60%
-    ),
-    repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.012) 0,
-      rgba(0, 0, 0, 0.012) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-  background-attachment: fixed;
-  color: var(--color-fg);
+    /* warm paper grain noise */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.31 0 0 0 0 0.17 0 0 0 0.07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    /* warm radial wash top-left */
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(255, 233, 176, 0.45), transparent 60%),
+    /* peach wash bottom-right */
+    radial-gradient(ellipse 70% 50% at 100% 100%, rgba(255, 200, 150, 0.25), transparent 65%);
+  background-attachment: fixed, fixed, fixed;
+  background-size: 240px 240px, auto, auto;
+  color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: var(--text-body);
-  font-weight: 400;
-  line-height: 1.44;
+  font-weight: 500;
+  line-height: 1.5;
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -220,10 +170,10 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  line-height: 1.4;
   color: var(--color-ink);
 }
 
@@ -235,207 +185,90 @@ button {
   font-family: inherit;
 }
 
-/* ---------- Primitives ---------- */
-.kd-display {
-  font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  color: var(--color-ink);
+a {
+  color: inherit;
 }
 
+/* ---------- App primitives ---------- */
 .kd-eyebrow {
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
+  font-size: var(--text-caption);
   font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.kd-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-3xl);
-  box-shadow: var(--shadow-card);
-  padding: var(--space-7);
-}
-
-.kd-card-flat {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-3xl);
-  padding: var(--space-7);
+  color: var(--color-ink-soft);
+  letter-spacing: 0;
 }
 
 .kd-rule {
   display: block;
   width: 100%;
   height: 1px;
-  background: var(--color-border);
+  background: var(--color-line);
   border: 0;
   margin: 0;
 }
 
-/* Decorative pill chips (amethyst / sky) */
-.kd-chip-amethyst {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-amethyst);
-  color: var(--color-amethyst-ink);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0.06em;
+/* ---------- Warm card / handnote primitives ---------- */
+.kd-card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  position: relative;
 }
 
-.kd-chip-sky {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-sky);
-  color: var(--color-sky-ink);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0.06em;
+.kd-card-deep {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-deep);
+  padding: var(--space-5);
+  position: relative;
 }
 
-/* ---------- Editorial primitives ---------- */
-
-/* Top-rule + bottom-rule masthead block, vertical metadata stacked under
-   wordmark — replaces fragile 3-col flex that overflowed on narrow phones. */
-.kd-masthead {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4) 0 var(--space-3);
-  border-top: 2px solid var(--color-ink);
-  border-bottom: 1px solid var(--color-border);
+/* handnote micro-tilt — design system applies via class */
+.kd-tilt-l {
+  transform: rotate(-1.2deg);
+}
+.kd-tilt-r {
+  transform: rotate(1.2deg);
+}
+.kd-tilt-ll {
+  transform: rotate(-2.4deg);
+}
+.kd-tilt-rr {
+  transform: rotate(2deg);
 }
 
-.kd-masthead-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-3);
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-muted);
+@media (prefers-reduced-motion: reduce) {
+  .kd-tilt-l,
+  .kd-tilt-r,
+  .kd-tilt-ll,
+  .kd-tilt-rr {
+    transform: none !important;
+  }
 }
 
-.kd-masthead-row > span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.kd-wordmark {
-  font-family: var(--font-display);
-  font-size: clamp(40px, 13vw, 64px);
-  font-weight: 400;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  color: var(--color-ink);
-}
-
-/* Section eyebrow — short uppercase tracked label that sits above headlines.
-   Includes a hanging hairline rule for editorial weight. */
-.kd-section-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.kd-section-eyebrow::before {
+/* speech bubble tail — applied via class on bubble container */
+.kd-bubble-tail-l::before {
   content: "";
-  display: inline-block;
-  width: 28px;
-  height: 2px;
-  background: var(--color-ink);
-  flex-shrink: 0;
-}
-
-/* Ruled list — used for the three-rules block. Each item is divided by a hair
-   rule with a hanging Fraunces numeral in the gutter. */
-.kd-ruled-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--color-border);
-}
-
-.kd-ruled-list > li {
-  display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: var(--space-4);
-  align-items: baseline;
-  padding: var(--space-5) 0 var(--space-5);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.kd-ruled-list .kd-numeral {
-  font-family: var(--font-display);
-  font-size: 56px;
-  font-weight: 400;
-  line-height: 0.9;
-  letter-spacing: -0.02em;
-  color: var(--color-ink);
-}
-
-.kd-ruled-list .kd-numeral-sub {
-  display: block;
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  margin-top: var(--space-1);
-}
-
-/* Watermark glyph — the giant Fraunces character sitting behind the
-   risk-poster. Sets the editorial tone with scale contrast. */
-.kd-watermark {
   position: absolute;
-  font-family: var(--font-display);
-  font-weight: 400;
-  line-height: 0.78;
-  letter-spacing: -0.04em;
-  pointer-events: none;
-  user-select: none;
+  left: 22px;
+  bottom: -10px;
+  width: 22px;
+  height: 16px;
+  background: inherit;
+  clip-path: polygon(0 0, 100% 0, 70% 100%);
+  filter: drop-shadow(0 2px 2px rgba(110, 80, 40, 0.08));
 }
 
-/* Hair rule above section labels */
-.kd-hair {
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: var(--color-border);
-  border: 0;
-  margin: 0;
-}
-
-/* Thicker editorial rule */
-.kd-ink-rule {
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: var(--color-ink);
-  border: 0;
-  margin: 0;
+.kd-bubble-tail-r::before {
+  content: "";
+  position: absolute;
+  right: 22px;
+  bottom: -10px;
+  width: 22px;
+  height: 16px;
+  background: inherit;
+  clip-path: polygon(0 0, 100% 0, 30% 100%);
+  filter: drop-shadow(0 2px 2px rgba(110, 80, 40, 0.08));
 }
 
 /* ---------- Accessibility ---------- */
@@ -468,18 +301,18 @@ button {
   white-space: normal;
   background: var(--color-ink);
   color: var(--color-surface);
-  border-radius: var(--radius-full);
-  font-weight: 600;
-  font-size: var(--text-base);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: var(--text-body);
+  box-shadow: var(--shadow-cta);
   z-index: 9999;
   text-decoration: none;
 }
 
 :where(button, a, [role="button"], input, textarea, select):focus-visible {
-  outline: none;
-  box-shadow: var(--shadow-focus);
-  border-radius: var(--radius-full);
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-button);
 }
 
 /* ---------- Reduced motion ---------- */
@@ -491,5 +324,191 @@ button {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+
+/* ===========================================================================
+   v3.1 Polish layer — SaaS-premium accents on warm handnote base.
+   Borrowed from JSON brief: layered soft shadow, amber gradient CTA,
+   editorial Playfair Display accent, off-white section divider.
+   Preserves elder readability (≥22px body, contrast, ≥88×88 touch).
+   =========================================================================== */
+:root {
+  /* Premium layered shadows — warm-tinted SaaS softness */
+  --shadow-soft:
+    0 10px 30px -8px rgba(80, 56, 24, 0.14),
+    0 4px 12px -4px rgba(80, 56, 24, 0.08);
+  --shadow-float:
+    0 24px 60px -16px rgba(80, 56, 24, 0.22),
+    0 8px 20px -8px rgba(80, 56, 24, 0.10);
+  --shadow-amber:
+    0 12px 28px -10px rgba(255, 152, 0, 0.55),
+    0 4px 10px -4px rgba(255, 184, 60, 0.40);
+  --shadow-press:
+    0 2px 6px -2px rgba(80, 56, 24, 0.18),
+    inset 0 1px 2px rgba(80, 56, 24, 0.12);
+
+  /* Editorial accent surface */
+  --color-surface-soft: #FBF6E5;
+  --color-ink-cool:     #1F2937;
+
+  /* Glass (subtle backdrop chrome) */
+  --color-glass:        rgba(255, 253, 247, 0.72);
+  --color-glass-strong: rgba(255, 253, 247, 0.86);
+
+  /* Amber gradient — borrowed from SaaS brief */
+  --gradient-amber:
+    linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+  --gradient-amber-soft:
+    linear-gradient(135deg, #FFE082 0%, #FFB74D 100%);
+
+  /* Warm card gradient — premium depth */
+  --gradient-card-warm:
+    linear-gradient(180deg, #FFFEF7 0%, #FFFBEC 100%);
+
+  /* Bubble inner highlight — top sheen */
+  --gradient-bubble-sheen:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 35%);
+
+  /* Serif accent font (Playfair Display via next/font CSS var) */
+  --font-serif-stack:
+    var(--font-serif), "Source Han Serif SC", "Songti SC",
+    Georgia, "Times New Roman", serif;
+}
+
+/* Editorial moment — Playfair italic emphasis on key word */
+.kd-serif {
+  font-family: var(--font-serif-stack);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+
+/* Premium soft card — layered SaaS shadow on warm gradient */
+.kd-card-soft {
+  background: var(--gradient-card-warm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.kd-card-soft::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-bubble-sheen);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.kd-card-soft > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Off-white section divider — borrowed from SaaS section-alt */
+.kd-section-soft {
+  background: var(--color-surface-soft);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 0 0 1px rgba(184, 153, 104, 0.16);
+}
+
+/* Amber-gradient camera CTA — premium SaaS accent on primary action */
+.kd-cta-amber {
+  background: var(--gradient-amber);
+  color: #1A1410;
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-amber);
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out);
+}
+
+.kd-cta-amber:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 16px 32px -10px rgba(255, 152, 0, 0.62),
+    0 6px 12px -4px rgba(255, 184, 60, 0.46);
+}
+
+.kd-cta-amber:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--shadow-press);
+}
+
+/* Premium tile — layered shadow + hover lift */
+.kd-tile-premium {
+  background: var(--gradient-card-warm);
+  box-shadow: var(--shadow-soft);
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.kd-tile-premium::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-bubble-sheen);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.kd-tile-premium > * {
+  position: relative;
+  z-index: 1;
+}
+
+.kd-tile-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+}
+
+.kd-tile-premium:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: var(--shadow-press);
+}
+
+/* BigButton — premium hover/active lift for primary/secondary/danger */
+.kd-bigbutton {
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out),
+    background var(--motion-fast) var(--ease-out);
+}
+
+.kd-bigbutton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.kd-bigbutton:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--shadow-press);
+}
+
+/* Glass chrome — footer fade / sticky bar backdrop */
+.kd-glass {
+  background: var(--color-glass);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kd-cta-amber:hover,
+  .kd-tile-premium:hover,
+  .kd-bigbutton:hover:not(:disabled) {
+    transform: none;
   }
 }

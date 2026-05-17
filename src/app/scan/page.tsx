@@ -11,14 +11,16 @@ import { ScanView } from "@/components/scan/ScanView";
  */
 function ScanFallback() {
   const heroStyle: CSSProperties = {
-    fontSize: "var(--text-hero)",
+    fontSize: "var(--text-headline)",
+    fontWeight: 800,
+    color: "var(--color-ink)",
     textAlign: "center",
     marginTop: "var(--space-4)",
   };
 
   const subStyle: CSSProperties = {
     fontSize: "var(--text-body)",
-    color: "var(--color-muted)",
+    color: "var(--color-ink-soft)",
     textAlign: "center",
     marginTop: "var(--space-2)",
   };
